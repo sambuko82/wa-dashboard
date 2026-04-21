@@ -61,6 +61,10 @@ model MessageLog {
   contactId  String?
   contact    Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
   createdAt  DateTime  @default(now())
+
+  @@index([numberId])
+  @@index([contactId])
+  @@index([createdAt])
 }
 
 model Contact {
@@ -83,6 +87,8 @@ model Contact {
   updatedAt       DateTime       @updatedAt
 
   @@unique([waNumberId, phoneNumber])
+  @@index([waNumberId])
+  @@index([pipelineStageId])
 }
 
 model PipelineStage {
@@ -95,6 +101,8 @@ model PipelineStage {
   contacts  Contact[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@index([userId])
 }
 
 model Reminder {
@@ -106,6 +114,9 @@ model Reminder {
   isCompleted Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([contactId])
+  @@index([dueDate])
 }
 
 model Label {
@@ -117,6 +128,8 @@ model Label {
   contacts  Contact[] @relation("ContactLabels")
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@index([userId])
 }
 
 model ContactNote {
@@ -126,6 +139,8 @@ model ContactNote {
   content   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([contactId])
 }
 
 model Template {
