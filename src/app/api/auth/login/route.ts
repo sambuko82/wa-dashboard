@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
       email: user.email,
       name: user.name,
       role: user.role as "ADMIN" | "USER",
+      isJvto: user.isJvto,
     });
 
     const response = NextResponse.json({

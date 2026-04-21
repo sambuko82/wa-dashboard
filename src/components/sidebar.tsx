@@ -71,7 +71,18 @@ export function Sidebar() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const navGroups = user?.role === "ADMIN" ? adminNavGroups : userNavGroups;
+  const CRM_HREFS = ["/contacts", "/crm", "/reminders"];
+
+  const filterJvto = (groups: NavGroup[]) =>
+    groups
+      .map((g) => ({
+        ...g,
+        items: g.items.filter((item) => !CRM_HREFS.some((h) => item.href.startsWith(h))),
+      }))
+      .filter((g) => g.items.length > 0);
+
+  const baseGroups = user?.role === "ADMIN" ? adminNavGroups : userNavGroups;
+  const navGroups = user?.isJvto ? filterJvto(baseGroups) : baseGroups;
   const navItems = flattenGroups(navGroups);
   const currentPage =
     navItems.find((item) =>

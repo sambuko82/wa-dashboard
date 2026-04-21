@@ -7,6 +7,7 @@ export interface AuthUser {
   email: string;
   name: string;
   role: "ADMIN" | "USER";
+  isJvto: boolean;
 }
 
 interface AuthContextValue {

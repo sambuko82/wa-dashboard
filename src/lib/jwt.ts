@@ -10,6 +10,7 @@ export interface JwtPayload {
   email: string;
   name: string;
   role: "ADMIN" | "USER";
+  isJvto: boolean;
 }
 
 export async function signToken(payload: JwtPayload): Promise<string> {
