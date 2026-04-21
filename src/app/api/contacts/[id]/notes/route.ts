@@ -16,7 +16,7 @@ export async function POST(
 
   const contact = await db.contact.findUnique({
     where: { id },
-    include: { waNumber: true }
+    include: { waNumber: { select: { userId: true } } }
   });
 
   if (!contact) return NextResponse.json({ error: "Not found" }, { status: 404 });

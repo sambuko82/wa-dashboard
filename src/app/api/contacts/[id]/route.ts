@@ -14,14 +14,10 @@ export async function GET(
     where: { id },
     include: {
       labels: true,
-      adminNotes: {
-        orderBy: { createdAt: "desc" }
-      },
-      reminders: {
-        orderBy: { dueDate: "asc" }
-      },
-      waNumber: true,
-    }
+      adminNotes: { orderBy: { createdAt: "desc" } },
+      reminders: { orderBy: { dueDate: "asc" } },
+      waNumber: { select: { userId: true, label: true, phoneNumber: true } },
+    },
   });
 
   if (!contact) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -42,7 +38,7 @@ export async function DELETE(
   const { id } = await params;
   const contact = await db.contact.findUnique({
     where: { id },
-    include: { waNumber: true }
+    include: { waNumber: { select: { userId: true } } }
   });
 
   if (!contact) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -68,7 +64,7 @@ export async function PATCH(
 
   const contact = await db.contact.findUnique({
     where: { id },
-    include: { waNumber: true }
+    include: { waNumber: { select: { userId: true } } }
   });
 
   if (!contact) return NextResponse.json({ error: "Not found" }, { status: 404 });

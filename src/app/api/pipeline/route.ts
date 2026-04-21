@@ -110,7 +110,7 @@ export async function PATCH(req: NextRequest) {
   // Ensure contact belongs to user
   const contact = await db.contact.findUnique({
     where: { id: contactId },
-    include: { waNumber: true }
+    include: { waNumber: { select: { userId: true } } }
   });
 
   if (!contact || contact.waNumber.userId !== session.userId) {

@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   // Ensure contact belongs to user
   const contact = await db.contact.findUnique({
     where: { id: contactId },
-    include: { waNumber: true }
+    include: { waNumber: { select: { userId: true } } }
   });
 
   if (!contact || contact.waNumber.userId !== session.userId) {
@@ -61,7 +61,7 @@ export async function PATCH(req: NextRequest) {
 
   const reminder = await db.reminder.findUnique({
     where: { id },
-    include: { contact: { include: { waNumber: true } } }
+    include: { contact: { include: { waNumber: { select: { userId: true } } } } }
   });
 
   if (!reminder || reminder.contact.waNumber.userId !== session.userId) {
