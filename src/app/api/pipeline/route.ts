@@ -2,9 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const slim = new URL(req.url).searchParams.get("slim") === "true";
+
+  if (slim) {
+    // Lightweight: only id/name/color — no contacts loaded
+    const stages = await db.pipelineStage.findMany({
+      where: { userId: session.userId },
+      orderBy: { order: "asc" },
+      select: { id: true, name: true, color: true },
+    });
+    return NextResponse.json(stages);
+  }
 
   const stages = await db.pipelineStage.findMany({
     where: { userId: session.userId },
@@ -13,12 +25,10 @@ export async function GET() {
       contacts: {
         include: {
           labels: true,
-          _count: {
-            select: { messages: true }
-          }
-        }
-      }
-    }
+          _count: { select: { messages: true } },
+        },
+      },
+    },
   });
 
   return NextResponse.json(stages);

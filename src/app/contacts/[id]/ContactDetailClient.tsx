@@ -64,7 +64,7 @@ export default function ContactDetailPage() {
     try {
       const [conRes, pipeRes, labRes] = await Promise.all([
         fetch(`/api/contacts/${id}`),
-        fetch("/api/pipeline"),
+        fetch("/api/pipeline?slim=true"),
         fetch("/api/labels"),
       ]);
       if (!conRes.ok) {
