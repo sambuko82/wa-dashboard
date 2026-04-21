@@ -7,17 +7,18 @@ import {
   Bell,
   Calendar,
   CheckCircle2,
-  Clock,
   History,
   Loader2,
   Mail,
   MessageSquare,
+  Pencil,
   Phone,
   Plus,
   Save,
   ShieldCheck,
   Tag,
   User,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -59,6 +60,14 @@ export default function ContactDetailPage() {
   const [reminderDate, setReminderDate] = useState("");
   const [addingReminder, setAddingReminder] = useState(false);
   const [showLabelPicker, setShowLabelPicker] = useState(false);
+  const [editingInfo, setEditingInfo] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [savingInfo, setSavingInfo] = useState(false);
+  const [editingContext, setEditingContext] = useState(false);
+  const [editNotes, setEditNotes] = useState("");
+  const [savingContext, setSavingContext] = useState(false);
 
   const fetchContact = async () => {
     try {
@@ -163,6 +172,59 @@ export default function ContactDetailPage() {
     }
   };
 
+  const startEditInfo = () => {
+    if (!contact) return;
+    setEditName(contact.name || "");
+    setEditEmail(contact.email || "");
+    setEditPhone(contact.phoneNumber);
+    setEditingInfo(true);
+  };
+
+  const saveInfo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editPhone.trim()) return;
+    setSavingInfo(true);
+    try {
+      const res = await fetch(`/api/contacts/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editName.trim() || null,
+          email: editEmail.trim() || null,
+          phoneNumber: editPhone.trim(),
+        }),
+      });
+      if (res.ok) {
+        setEditingInfo(false);
+        fetchContact();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingInfo(false);
+    }
+  };
+
+  const saveContext = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingContext(true);
+    try {
+      const res = await fetch(`/api/contacts/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notes: editNotes.trim() || null }),
+      });
+      if (res.ok) {
+        setEditingContext(false);
+        fetchContact();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingContext(false);
+    }
+  };
+
   const toggleReminder = async (reminderId: string, isCompleted: boolean) => {
     try {
       await fetch("/api/reminders", {
@@ -204,59 +266,94 @@ export default function ContactDetailPage() {
       <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
         <section className="space-y-5">
           <div className="app-card p-6">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-              <div className="flex items-start gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-[#eef1ff] text-2xl font-semibold text-[#546dfe]">
-                  {contact.name?.[0] || <User className="h-7 w-7" />}
+            {editingInfo ? (
+              <form onSubmit={saveInfo} className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-slate-700">Edit Contact Info</p>
+                  <button type="button" onClick={() => setEditingInfo(false)} className="app-icon-button h-7 w-7">
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-2xl font-semibold text-slate-900">{contact.name || "Contact"}</h2>
-                    {contact.labels.map((label) => (
-                      <span
-                        key={label.id}
-                        className="rounded-md px-2 py-1 text-[11px] font-semibold text-white"
-                        style={{ backgroundColor: label.color }}
-                      >
-                        {label.name}
-                      </span>
-                    ))}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-500">Name</label>
+                    <input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Full name" className="app-input" />
                   </div>
-                  <div className="mt-3 grid gap-2 text-sm text-slate-500 md:grid-cols-2">
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-slate-400" />
-                      +{contact.phoneNumber}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-slate-400" />
-                      {contact.email || "no-email@invalid"}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <History className="h-4 w-4 text-slate-400" />
-                      Joined <FormattedDate date={contact.createdAt} />
-                    </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-slate-500">Phone Number *</label>
+                    <input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} placeholder="628123..." className="app-input" required />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="mb-1 block text-xs font-medium text-slate-500">Email</label>
+                    <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} placeholder="email@example.com" className="app-input" />
                   </div>
                 </div>
-              </div>
+                <div className="flex justify-end gap-2">
+                  <button type="button" onClick={() => setEditingInfo(false)} className="app-button-secondary">Cancel</button>
+                  <button type="submit" disabled={savingInfo || !editPhone.trim()} className="app-button-primary">
+                    {savingInfo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                    Save
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-[#eef1ff] text-2xl font-semibold text-[#546dfe]">
+                    {contact.name?.[0] || <User className="h-7 w-7" />}
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-2xl font-semibold text-slate-900">{contact.name || "Contact"}</h2>
+                      {contact.labels.map((label) => (
+                        <span
+                          key={label.id}
+                          className="rounded-md px-2 py-1 text-[11px] font-semibold text-white"
+                          style={{ backgroundColor: label.color }}
+                        >
+                          {label.name}
+                        </span>
+                      ))}
+                      <button onClick={startEditInfo} className="app-icon-button h-7 w-7 ml-1" title="Edit info">
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <div className="mt-3 grid gap-2 text-sm text-slate-500 md:grid-cols-2">
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-slate-400" />
+                        +{contact.phoneNumber}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-slate-400" />
+                        {contact.email || <span className="italic text-slate-400">No email</span>}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <History className="h-4 w-4 text-slate-400" />
+                        Joined <FormattedDate date={contact.createdAt} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="min-w-[220px]">
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                  Pipeline Stage
-                </label>
-                <select
-                  value={contact.pipelineStageId || ""}
-                  onChange={(e) => updateStage(e.target.value)}
-                  className="app-select"
-                >
-                  <option value="">Not assigned</option>
-                  {stages.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="min-w-[220px]">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    Pipeline Stage
+                  </label>
+                  <select
+                    value={contact.pipelineStageId || ""}
+                    onChange={(e) => updateStage(e.target.value)}
+                    className="app-select"
+                  >
+                    <option value="">Not assigned</option>
+                    {stages.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="app-card p-6">
@@ -415,13 +512,42 @@ export default function ContactDetailPage() {
           </div>
 
           <div className="app-card p-6">
-            <div className="mb-3 flex items-center gap-2">
-              <Tag className="h-5 w-5 text-[#546dfe]" />
-              <h3 className="text-lg font-semibold text-slate-900">Context</h3>
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Tag className="h-5 w-5 text-[#546dfe]" />
+                <h3 className="text-lg font-semibold text-slate-900">Context</h3>
+              </div>
+              {!editingContext && (
+                <button
+                  onClick={() => { setEditNotes(contact.notes || ""); setEditingContext(true); }}
+                  className="text-sm font-medium text-[#546dfe]"
+                >
+                  Edit
+                </button>
+              )}
             </div>
-            <p className="text-sm leading-6 text-slate-600">
-              {contact.notes || "No additional context saved for this contact."}
-            </p>
+            {editingContext ? (
+              <form onSubmit={saveContext} className="space-y-3">
+                <textarea
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  placeholder="Add context about this contact (background, preferences, important details)..."
+                  className="app-textarea min-h-28"
+                  rows={4}
+                />
+                <div className="flex justify-end gap-2">
+                  <button type="button" onClick={() => setEditingContext(false)} className="app-button-secondary">Cancel</button>
+                  <button type="submit" disabled={savingContext} className="app-button-primary">
+                    {savingContext ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                    Save
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <p className="text-sm leading-6 text-slate-600">
+                {contact.notes || <span className="italic text-slate-400">No additional context saved for this contact.</span>}
+              </p>
+            )}
           </div>
         </aside>
       </div>

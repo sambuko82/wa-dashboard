@@ -60,7 +60,7 @@ export async function PATCH(
 
   const { id } = await params;
   const body = await req.json();
-  const { name, email, notes, labelIds } = body;
+  const { name, email, notes, phoneNumber, labelIds } = body;
 
   const contact = await db.contact.findUnique({
     where: { id },
@@ -75,12 +75,11 @@ export async function PATCH(
   const updated = await db.contact.update({
     where: { id },
     data: {
-      name,
-      email,
-      notes,
-      labels: labelIds ? {
-        set: labelIds.map((lid: string) => ({ id: lid }))
-      } : undefined,
+      ...(name !== undefined ? { name: name || null } : {}),
+      ...(email !== undefined ? { email: email || null } : {}),
+      ...(notes !== undefined ? { notes: notes || null } : {}),
+      ...(phoneNumber !== undefined ? { phoneNumber } : {}),
+      ...(labelIds ? { labels: { set: labelIds.map((lid: string) => ({ id: lid })) } } : {}),
     },
     include: { 
       labels: true,
