@@ -12,27 +12,27 @@ function CopyButton({ text }: { text: string }) {
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <button onClick={copy} className="text-gray-400 hover:text-gray-600 transition-colors">
-      {copied ? <Check className="w-4 h-4 text-[#25d366]" /> : <Copy className="w-4 h-4" />}
+    <button onClick={copy} className="text-slate-400 transition-colors hover:text-slate-700">
+      {copied ? <Check className="w-4 h-4 text-[#546dfe]" /> : <Copy className="w-4 h-4" />}
     </button>
   );
 }
 
 function CodeBlock({ code }: { code: string }) {
   return (
-    <div className="relative bg-gray-50 rounded-xl p-4 border border-gray-200">
+    <div className="relative rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4">
       <div className="absolute top-2 right-2">
         <CopyButton text={code} />
       </div>
-      <pre className="text-green-700 text-xs font-mono overflow-x-auto pr-6 whitespace-pre-wrap break-all">{code}</pre>
+      <pre className="overflow-x-auto whitespace-pre-wrap break-all pr-6 text-xs font-mono text-[#4358d8]">{code}</pre>
     </div>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mb-8">
-      <h2 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-3">{title}</h2>
+    <div className="mb-10">
+      <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-slate-400">{title}</h2>
       {children}
     </div>
   );
@@ -42,10 +42,10 @@ function Badge({ code, label }: { code: string; label?: string }) {
   const isSuccess = code === "200";
   return (
     <span className="inline-flex items-center gap-1">
-      <span className={`text-xs font-bold px-2 py-0.5 rounded ${isSuccess ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"}`}>
+      <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${isSuccess ? "bg-[#eef1ff] text-[#4358d8]" : "bg-red-50 text-red-600"}`}>
         {code}
       </span>
-      {label && <span className="text-gray-400 text-xs">{label}</span>}
+      {label && <span className="text-xs text-slate-400">{label}</span>}
     </span>
   );
 }
@@ -71,28 +71,28 @@ function Endpoint({
   const [tab, setTab] = useState<"body" | "php" | "curl">("body");
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+    <div className="app-card overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-3 px-5 py-4 hover:bg-gray-50 transition-colors text-left"
+        className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[#f8fafc]"
       >
         <span
-          className={`text-xs font-bold px-2 py-0.5 rounded flex-shrink-0 ${
+          className={`flex-shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${
             method === "GET"
-              ? "bg-blue-50 text-blue-700"
-              : "bg-green-50 text-green-700"
+              ? "bg-sky-50 text-sky-700"
+              : "bg-[#eef1ff] text-[#4358d8]"
           }`}
         >
           {method}
         </span>
-        <code className="text-gray-700 text-sm font-mono">{path}</code>
-        <span className="text-gray-400 text-xs ml-2 flex-1">{description}</span>
-        {open ? <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" /> : <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />}
+        <code className="text-sm font-mono text-slate-700">{path}</code>
+        <span className="ml-2 flex-1 text-xs text-slate-400">{description}</span>
+        {open ? <ChevronDown className="h-4 w-4 flex-shrink-0 text-slate-400" /> : <ChevronRight className="h-4 w-4 flex-shrink-0 text-slate-400" />}
       </button>
       {open && (
-        <div className="px-5 pb-5 border-t border-gray-100 pt-4 space-y-3">
+        <div className="space-y-3 border-t border-[#eef3f8] px-5 pb-5 pt-4">
           {note && (
-            <p className="text-yellow-700 text-xs bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
+            <p className="rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs text-yellow-700">
               {note}
             </p>
           )}
@@ -102,7 +102,7 @@ function Endpoint({
                 {body && (
                   <button
                     onClick={() => setTab("body")}
-                    className={`text-xs px-3 py-1 rounded-full border transition-colors ${tab === "body" ? "border-green-400 text-green-700 bg-green-50" : "border-gray-200 text-gray-400 hover:text-gray-600"}`}
+                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${tab === "body" ? "border-[#cfd7ff] bg-[#eef1ff] text-[#4358d8]" : "border-[#dbe4ef] text-slate-400 hover:text-slate-700"}`}
                   >
                     JSON Body
                   </button>
@@ -110,7 +110,7 @@ function Endpoint({
                 {phpExample && (
                   <button
                     onClick={() => setTab("php")}
-                    className={`text-xs px-3 py-1 rounded-full border transition-colors ${tab === "php" ? "border-green-400 text-green-700 bg-green-50" : "border-gray-200 text-gray-400 hover:text-gray-600"}`}
+                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${tab === "php" ? "border-[#cfd7ff] bg-[#eef1ff] text-[#4358d8]" : "border-[#dbe4ef] text-slate-400 hover:text-slate-700"}`}
                   >
                     PHP
                   </button>
@@ -118,7 +118,7 @@ function Endpoint({
                 {body && (
                   <button
                     onClick={() => setTab("curl")}
-                    className={`text-xs px-3 py-1 rounded-full border transition-colors ${tab === "curl" ? "border-green-400 text-green-700 bg-green-50" : "border-gray-200 text-gray-400 hover:text-gray-600"}`}
+                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${tab === "curl" ? "border-[#cfd7ff] bg-[#eef1ff] text-[#4358d8]" : "border-[#dbe4ef] text-slate-400 hover:text-slate-700"}`}
                   >
                     cURL
                   </button>
@@ -127,13 +127,13 @@ function Endpoint({
               {tab === "body" && body && <CodeBlock code={body} />}
               {tab === "php" && phpExample && <CodeBlock code={phpExample} />}
               {tab === "curl" && body && (
-                <p className="text-gray-400 text-xs italic">See cURL Examples section below.</p>
+                <p className="text-xs italic text-slate-400">See cURL Examples section below.</p>
               )}
             </div>
           )}
           {response && (
             <div>
-              <p className="text-gray-400 text-xs mb-1">Response</p>
+              <p className="mb-1 text-xs text-slate-400">Response</p>
               <CodeBlock code={response} />
             </div>
           )}
@@ -148,41 +148,42 @@ export default function ApiDocsPage() {
   useEffect(() => { setBaseUrl(window.location.origin); }, []);
 
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <BookOpen className="w-6 h-6 text-[#25d366]" />
+    <div className="mx-auto max-w-5xl">
+      <div className="app-page-header">
+        <div>
+          <span className="app-kicker">Developer resources</span>
+          <h1 className="app-page-title mt-4 flex items-center gap-3">
+            <BookOpen className="h-7 w-7 text-[#546dfe]" />
           API Documentation
-        </h1>
-        <p className="text-gray-500 text-sm mt-1">
+          </h1>
+          <p className="app-page-description">
           REST API kompatibel dengan WatZap WABA Unofficial — format request &amp; response sama persis
-        </p>
+          </p>
+        </div>
       </div>
 
-      {/* Migration note */}
-      <div className="bg-green-50 border border-green-200 rounded-2xl p-5 mb-8">
-        <p className="text-gray-900 font-medium text-sm mb-1">Migrasi dari WatZap?</p>
-        <p className="text-gray-500 text-xs leading-relaxed">
-          Ganti hanya <strong className="text-gray-700">3 hal</strong> di config aplikasimu:
+      <div className="app-card mb-10 border-[#cfd7ff] bg-[#f4f6ff] p-6">
+        <p className="text-sm font-bold text-slate-900">Migrasi dari WatZap?</p>
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          Ganti hanya <strong className="text-slate-700">3 hal</strong> di config aplikasimu:
         </p>
-        <ul className="mt-2 space-y-1">
-          <li className="text-gray-500 text-xs flex gap-2">
-            <span className="text-[#25d366]">1.</span>
-            <span><code className="text-gray-700">url</code> → <code className="text-green-700">{baseUrl}/api/v1/...</code></span>
+        <ul className="mt-3 space-y-2">
+          <li className="flex gap-2 text-sm text-slate-500">
+            <span className="text-[#546dfe]">1.</span>
+            <span><code className="text-slate-700">url</code> → <code className="text-[#4358d8]">{baseUrl}/api/v1/...</code></span>
           </li>
-          <li className="text-gray-500 text-xs flex gap-2">
-            <span className="text-[#25d366]">2.</span>
-            <span><code className="text-gray-700">api_key</code> → isi bebas (atau samakan dengan number_key)</span>
+          <li className="flex gap-2 text-sm text-slate-500">
+            <span className="text-[#546dfe]">2.</span>
+            <span><code className="text-slate-700">api_key</code> → isi bebas (atau samakan dengan number_key)</span>
           </li>
-          <li className="text-gray-500 text-xs flex gap-2">
-            <span className="text-[#25d366]">3.</span>
-            <span><code className="text-gray-700">number_key</code> → API Key dari halaman Numbers di dashboard ini</span>
+          <li className="flex gap-2 text-sm text-slate-500">
+            <span className="text-[#546dfe]">3.</span>
+            <span><code className="text-slate-700">number_key</code> → API Key dari halaman Numbers di dashboard ini</span>
           </li>
         </ul>
         <Link
           href="/numbers"
-          className="inline-flex items-center gap-1.5 mt-3 text-xs text-[#25d366] hover:underline"
+          className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#4358d8] hover:underline"
         >
           <Phone className="w-3.5 h-3.5" />
           Lihat API Key Nomor Saya
@@ -192,9 +193,9 @@ export default function ApiDocsPage() {
 
       {/* Base URL */}
       <Section title="Base URL">
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+        <div className="app-card p-5">
           <div className="flex items-center gap-2">
-            <code className="text-gray-900 font-mono text-sm flex-1">{baseUrl}/api/v1</code>
+            <code className="flex-1 text-sm font-mono text-slate-900">{baseUrl}/api/v1</code>
             <CopyButton text={`${baseUrl}/api/v1`} />
           </div>
         </div>
@@ -202,19 +203,19 @@ export default function ApiDocsPage() {
 
       {/* Authentication */}
       <Section title="Autentikasi">
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-3 shadow-sm">
-          <p className="text-gray-600 text-sm">
-            Semua request menggunakan <code className="text-green-700">api_key</code> dan{" "}
-            <code className="text-green-700">number_key</code> di <strong className="text-gray-800">request body</strong> (bukan header).
+        <div className="app-card space-y-3 p-5">
+          <p className="text-sm text-slate-600">
+            Semua request menggunakan <code className="text-[#4358d8]">api_key</code> dan{" "}
+            <code className="text-[#4358d8]">number_key</code> di <strong className="text-slate-800">request body</strong> (bukan header).
           </p>
           <CodeBlock code={`{
   "api_key":    "isi bebas atau samakan dengan number_key",
   "number_key": "XXXXXX-YYYYYY-ZZZZZZ"  ← ambil dari tab API di halaman Numbers
 }`} />
           <div className="flex items-start gap-2 pt-1">
-            <Key className="w-3.5 h-3.5 text-[#25d366] flex-shrink-0 mt-0.5" />
-            <p className="text-gray-400 text-xs">
-              <code className="text-gray-600">number_key</code> menentukan nomor WA mana yang digunakan untuk mengirim.
+            <Key className="w-3.5 h-3.5 text-[#546dfe] flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-slate-400">
+              <code className="text-slate-600">number_key</code> menentukan nomor WA mana yang digunakan untuk mengirim.
               Setiap nomor WA memiliki key yang berbeda.
             </p>
           </div>
@@ -223,7 +224,7 @@ export default function ApiDocsPage() {
 
       {/* Error Codes */}
       <Section title="Kode Error">
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+        <div className="app-card p-5">
           <div className="space-y-2">
             {[
               { code: "200", label: "Success", desc: "Pesan berhasil dikirim" },
@@ -235,8 +236,8 @@ export default function ApiDocsPage() {
             ].map((e) => (
               <div key={e.code} className="flex items-center gap-3">
                 <Badge code={e.code} />
-                <span className="text-gray-600 text-xs w-32 flex-shrink-0">{e.label}</span>
-                <span className="text-gray-400 text-xs">{e.desc}</span>
+                <span className="w-32 flex-shrink-0 text-xs text-slate-600">{e.label}</span>
+                <span className="text-xs text-slate-400">{e.desc}</span>
               </div>
             ))}
           </div>
@@ -474,21 +475,21 @@ curl_close($curl);`}
 
       {/* Legacy endpoints */}
       <Section title="Legacy Endpoint (lama)">
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-3 shadow-sm">
+        <div className="app-card space-y-3 p-5">
           <p className="text-gray-500 text-xs">
             Endpoint lama masih berjalan. Auth menggunakan header <code className="text-yellow-600">Authorization: Bearer &lt;api_key&gt;</code>.
             Direkomendasikan migrasi ke endpoint baru di atas.
           </p>
           <div className="space-y-1 text-xs font-mono">
             <div className="flex gap-3">
-              <span className="bg-green-50 text-green-700 text-xs font-bold px-2 py-0.5 rounded flex-shrink-0">POST</span>
-              <code className="text-gray-500">/api/v1/send/text</code>
-              <span className="text-gray-400">body: {`{ to, text }`}</span>
+              <span className="rounded-md bg-[#eef1ff] px-2 py-0.5 text-xs font-bold text-[#4358d8] flex-shrink-0">POST</span>
+              <code className="text-slate-600">/api/v1/send/text</code>
+              <span className="text-slate-400">body: {`{ to, text }`}</span>
             </div>
             <div className="flex gap-3">
-              <span className="bg-green-50 text-green-700 text-xs font-bold px-2 py-0.5 rounded flex-shrink-0">POST</span>
-              <code className="text-gray-500">/api/v1/send/media</code>
-              <span className="text-gray-400">body: {`{ to, url, type, caption }`}</span>
+              <span className="rounded-md bg-[#eef1ff] px-2 py-0.5 text-xs font-bold text-[#4358d8] flex-shrink-0">POST</span>
+              <code className="text-slate-600">/api/v1/send/media</code>
+              <span className="text-slate-400">body: {`{ to, url, type, caption }`}</span>
             </div>
           </div>
         </div>
@@ -496,7 +497,7 @@ curl_close($curl);`}
 
       {/* Webhook */}
       <Section title="Webhook (Pesan Masuk)">
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-3 shadow-sm">
+        <div className="app-card space-y-3 p-5">
           <p className="text-gray-600 text-sm">
             Set URL webhook per nomor di tab <strong className="text-gray-800">Webhook</strong> untuk menerima pesan masuk.
           </p>

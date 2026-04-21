@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getOrCreateWaClient } from "@/lib/wa-client";
+import { getWaClient } from "@/lib/wa-client";
 
 export async function GET(
   _req: NextRequest,
@@ -17,6 +17,23 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const client = await getOrCreateWaClient(id);
-  return NextResponse.json({ ...client.getStatus(), label: number.label, apiKey: number.apiKey });
+  // Use in-memory client if it exists; otherwise return disconnected status from DB
+  // (avoids creating a new WA socket just to serve a status page load)
+  const client = getWaClient(id);
+  if (client) {
+    return NextResponse.json({ ...client.getStatus(), label: number.label, apiKey: number.apiKey });
+  }
+
+  return NextResponse.json({
+    status: "disconnected",
+    user: null,
+    stats: { sent: 0, received: 0, startTime: Date.now() },
+    uptime: 0,
+    webhookUrl: number.webhookUrl,
+    hasQr: false,
+    qr: null,
+    label: number.label,
+    apiKey: number.apiKey,
+    phoneNumber: number.phoneNumber,
+  });
 }

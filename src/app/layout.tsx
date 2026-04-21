@@ -8,8 +8,8 @@ import { headers } from "next/headers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "WA Dashboard",
-  description: "WhatsApp Multi-User Dashboard",
+  title: "WA PRO | Enterprise WhatsApp CRM",
+  description: "Advanced Multi-User WhatsApp CRM Dashboard",
 };
 
 export default async function RootLayout({
@@ -22,18 +22,20 @@ export default async function RootLayout({
   const isAuthPage = pathname === "/login" || pathname.startsWith("/login");
 
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-[#f4f4f6] text-gray-900 antialiased`}>
+    <html lang="en" className="scroll-smooth">
+      <body
+        className={`${inter.className} bg-[var(--app-bg)] text-slate-900 antialiased selection:bg-green-100 selection:text-green-700`}
+      >
         {isAuthPage ? (
-          <div className="min-h-screen flex items-center justify-center p-4">
-            {children}
+          <div className="relative flex min-h-screen items-center justify-center bg-[#eef2f8] px-4 py-10">
+            <div className="relative z-10 w-full flex justify-center">{children}</div>
           </div>
         ) : (
           <AuthProvider>
-            <div className="flex h-screen overflow-hidden">
+            <div className="min-h-screen bg-[var(--app-bg)]">
               <Sidebar />
-              <main className="flex-1 ml-60 overflow-y-auto">
-                <div className="min-h-screen p-6">{children}</div>
+              <main className="custom-scrollbar min-h-[calc(100vh-110px)] px-4 py-5 sm:px-6 lg:ml-[272px] lg:px-8">
+                {children}
               </main>
             </div>
           </AuthProvider>

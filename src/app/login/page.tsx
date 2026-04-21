@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MessageSquare, Mail, Lock, LogIn, Eye, EyeOff } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  LogIn,
+  Mail,
+  MessageSquare,
+} from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,84 +47,101 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full max-w-md">
-      {/* Logo */}
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-2xl bg-[#25d366] flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#25d366]/30">
-          <MessageSquare className="w-9 h-9 text-white" />
+    <div className="grid w-full max-w-5xl gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      <section className="hidden lg:block">
+        <span className="app-kicker">Workspace access</span>
+        <h1 className="mt-6 text-5xl font-black tracking-[-0.06em] text-slate-900">
+          Sign in to your WhatsApp operations hub.
+        </h1>
+        <p className="mt-5 max-w-xl text-base leading-7 text-slate-500">
+          A brighter dashboard shell, cleaner content hierarchy, and simpler daily
+          workflows are ready inside your account.
+        </p>
+        <div className="mt-8 grid max-w-xl gap-4 sm:grid-cols-2">
+          <div className="app-card-soft p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+              Unified CRM
+            </p>
+            <p className="mt-3 text-lg font-black tracking-[-0.03em] text-slate-900">
+              Contacts, pipeline, reminders
+            </p>
+          </div>
+          <div className="app-card-soft p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+              Multi-number control
+            </p>
+            <p className="mt-3 text-lg font-black tracking-[-0.03em] text-slate-900">
+              Monitor every WhatsApp channel
+            </p>
+          </div>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">WA Dashboard</h1>
-        <p className="text-gray-500 text-sm mt-1">Sign in to your account</p>
-      </div>
+      </section>
 
-      {/* Card */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+      <section className="app-card p-8 sm:p-10">
+        <div className="mb-8 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-[linear-gradient(135deg,#ff8da1,#b83280)] shadow-[0_20px_40px_-24px_rgba(184,50,128,0.7)]">
+            <MessageSquare className="h-8 w-8 text-white" />
+          </div>
+          <h2 className="mt-5 text-3xl font-black tracking-[-0.05em] text-slate-900">
+            WA Pro
+          </h2>
+          <p className="mt-2 text-sm text-slate-500">Sign in to continue to your dashboard</p>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Email */}
           <div>
-            <label className="text-gray-700 text-sm font-medium block mb-1.5">
-              Email
-            </label>
+            <label className="mb-2 block text-sm font-semibold text-slate-700">Email</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="admin@admin.com"
-                className="w-full bg-white border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-50 transition-colors"
+                className="app-input pl-11"
               />
             </div>
           </div>
 
-          {/* Password */}
           <div>
-            <label className="text-gray-700 text-sm font-medium block mb-1.5">
-              Password
-            </label>
+            <label className="mb-2 block text-sm font-semibold text-slate-700">Password</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type={showPass ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                className="w-full bg-white border border-gray-200 rounded-lg pl-10 pr-10 py-2.5 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-50 transition-colors"
+                className="app-input pl-11 pr-11"
               />
               <button
                 type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-700"
               >
-                {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
           </div>
 
-          {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-              <p className="text-red-600 text-sm">{error}</p>
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-[#25d366] hover:bg-[#22c55e] text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-[#25d366]/20 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <LogIn className="w-4 h-4" />
+          <button type="submit" disabled={loading} className="app-button-primary w-full py-3.5">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
-      </div>
 
-      <p className="text-gray-400 text-xs text-center mt-6">
-        WhatsApp Multi-User Dashboard · Powered by Baileys
-      </p>
+        <p className="mt-6 text-center text-xs text-slate-400">
+          WhatsApp Multi-User Dashboard · Powered by Baileys
+        </p>
+      </section>
     </div>
   );
 }

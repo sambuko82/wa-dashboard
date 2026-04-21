@@ -46,8 +46,8 @@ function CopyButton({ text }: { text: string }) {
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <button onClick={copy} className="text-gray-400 hover:text-gray-600 transition-colors">
-      {copied ? <Check className="w-4 h-4 text-[#25d366]" /> : <Copy className="w-4 h-4" />}
+    <button onClick={copy} className="text-slate-400 transition-colors hover:text-slate-700">
+      {copied ? <Check className="w-4 h-4 text-[#546dfe]" /> : <Copy className="w-4 h-4" />}
     </button>
   );
 }
@@ -88,29 +88,29 @@ function ConnectionTab({
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <span className="text-gray-500 text-sm">Connection Status</span>
+    <div className="mx-auto max-w-md">
+      <div className="app-card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-[#eef3f8] px-6 py-4">
+          <span className="text-sm font-medium text-slate-500">Connection Status</span>
           <StatusBadge status={info.status} />
         </div>
 
         <div className="p-8 flex flex-col items-center">
           {info.status === "connected" ? (
             <div className="flex flex-col items-center gap-6">
-              <div className="w-20 h-20 rounded-full bg-green-50 border-2 border-green-200 flex items-center justify-center">
-                <CheckCircle2 className="w-10 h-10 text-[#25d366]" />
+              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#cfd7ff] bg-[#eef1ff]">
+                <CheckCircle2 className="h-10 w-10 text-[#546dfe]" />
               </div>
               <div className="text-center">
-                <p className="text-gray-900 text-xl font-bold">Connected!</p>
+                <p className="text-xl font-semibold text-slate-900">Connected</p>
                 {info.phoneNumber && (
-                  <p className="text-gray-500 text-sm mt-1">+{info.phoneNumber}</p>
+                  <p className="mt-1 text-sm text-slate-500">+{info.phoneNumber}</p>
                 )}
               </div>
               <button
                 onClick={disconnect}
                 disabled={disconnecting}
-                className="flex items-center gap-2 border border-red-200 text-red-500 hover:bg-red-50 px-5 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
+                className="app-button-secondary border-red-200 text-red-600 hover:bg-red-50"
               >
                 <LogOut className="w-4 h-4" />
                 {disconnecting ? "Disconnecting..." : "Disconnect"}
@@ -118,26 +118,26 @@ function ConnectionTab({
             </div>
           ) : info.status === "connecting" && !info.qr ? (
             <div className="flex flex-col items-center gap-5 py-8">
-              <div className="w-16 h-16 rounded-full bg-yellow-50 border-2 border-yellow-200 flex items-center justify-center">
-                <RefreshCw className="w-8 h-8 text-yellow-600 animate-spin" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-200 bg-yellow-50">
+                <RefreshCw className="h-8 w-8 animate-spin text-yellow-600" />
               </div>
-              <p className="text-gray-900 font-semibold">Initializing...</p>
+              <p className="font-semibold text-slate-900">Initializing...</p>
             </div>
           ) : info.qr ? (
             <div className="flex flex-col items-center gap-6">
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-2xl">
+              <div className="rounded-lg border border-[#d8deef] bg-[#f8fafc] p-4">
                 <Image src={info.qr} alt="QR Code" width={260} height={260} unoptimized />
               </div>
               <div className="text-center">
-                <p className="text-gray-900 font-semibold">Scan this QR code</p>
-                <p className="text-gray-400 text-xs mt-1">
+                <p className="font-semibold text-slate-900">Scan this QR code</p>
+                <p className="mt-1 text-xs text-slate-400">
                   WhatsApp → More options → Linked devices → Link a device
                 </p>
               </div>
               <button
                 onClick={connect}
                 disabled={connecting}
-                className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm transition-all"
+                className="app-button-secondary"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${connecting ? "animate-spin" : ""}`} />
                 Refresh QR
@@ -145,19 +145,19 @@ function ConnectionTab({
             </div>
           ) : (
             <div className="flex flex-col items-center gap-6 py-6">
-              <div className="w-20 h-20 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                <QrCode className="w-10 h-10 text-gray-400" />
+              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#d8deef] bg-[#f8fafc]">
+                <QrCode className="h-10 w-10 text-slate-400" />
               </div>
               <div className="text-center">
-                <p className="text-gray-900 font-semibold">Not Connected</p>
-                <p className="text-gray-500 text-sm mt-1">
+                <p className="font-semibold text-slate-900">Not Connected</p>
+                <p className="mt-1 text-sm text-slate-500">
                   Click below to generate a QR code
                 </p>
               </div>
               <button
                 onClick={connect}
                 disabled={connecting}
-                className="flex items-center gap-2 bg-[#25d366] hover:bg-[#22c55e] text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-[#25d366]/20 disabled:opacity-60"
+                className="app-button-primary disabled:opacity-60"
               >
                 <QrCode className="w-4 h-4" />
                 {connecting ? "Generating..." : "Generate QR Code"}
@@ -360,7 +360,7 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
     { type: "template", icon: FileText, label: "Template" },
   ];
 
-  const inputCls = "w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-[#25d366] focus:ring-2 focus:ring-[#25d366]/10 transition-colors";
+  const inputCls = "app-input";
 
   // Resolve preview values
   const resolveVars = (s: string) =>
@@ -386,7 +386,7 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
   return (
     <div className="space-y-4">
       {!connected && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-2">
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
           <p className="text-amber-700 text-sm">Connect your WhatsApp first to send messages.</p>
         </div>
@@ -394,16 +394,16 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
 
       <div className={cn("gap-4", showPreview ? "grid grid-cols-1 lg:grid-cols-2" : "flex flex-col max-w-xl mx-auto w-full")}>
         {/* ── Form ── */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+        <div className="app-card p-5">
           {/* Type tabs */}
-          <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-5">
+          <div className="mb-5 flex gap-1 rounded-lg bg-[#f3f5fb] p-1">
             {tabs.map(({ type, icon: Icon, label }) => (
               <button
                 key={type}
                 onClick={() => setMsgType(type)}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-medium transition-all",
-                  msgType === type ? "bg-[#25d366] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+                  "flex-1 flex items-center justify-center gap-1.5 rounded-md py-1.5 text-xs font-medium transition-all",
+                  msgType === type ? "bg-[#546dfe] text-white shadow-sm" : "text-slate-500 hover:text-slate-700"
                 )}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -414,7 +414,7 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
 
           {/* To */}
           <div className="mb-4">
-            <label className="text-gray-500 text-xs font-medium block mb-1.5">Penerima</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-500">Penerima</label>
             <input
               value={to}
               onChange={(e) => setTo(e.target.value)}
@@ -426,7 +426,7 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
           {/* Text */}
           {msgType === "text" && (
             <div className="mb-4">
-              <label className="text-gray-500 text-xs font-medium block mb-1.5">Pesan</label>
+              <label className="mb-1.5 block text-xs font-medium text-slate-500">Pesan</label>
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -441,7 +441,7 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
           {msgType === "template" && (
             <div className="space-y-3 mb-4">
               <div>
-                <label className="text-gray-500 text-xs font-medium block mb-1.5">Template</label>
+                  <label className="mb-1.5 block text-xs font-medium text-slate-500">Template</label>
                 <select
                   value={templateId}
                   onChange={(e) => setTemplateId(e.target.value)}
@@ -455,7 +455,7 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
               </div>
 
               {loadingTpl && (
-                <div className="flex items-center gap-2 text-gray-400 text-xs py-1">
+                  <div className="flex items-center gap-2 py-1 text-xs text-slate-400">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   Loading...
                 </div>
@@ -464,19 +464,19 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
               {selectedTemplate && !loadingTpl && (
                 <>
                   {selectedTemplate.description && (
-                    <p className="text-gray-400 text-xs bg-gray-50 rounded-lg px-3 py-2 border border-gray-100">
+                    <p className="rounded-lg border border-[#e5ebf5] bg-[#f8fafc] px-3 py-2 text-xs text-slate-500">
                       {selectedTemplate.description}
                     </p>
                   )}
                   {selectedTemplate.variables.length > 0 && (
                     <div className="space-y-3 pt-1">
-                      <p className="text-gray-500 text-xs font-semibold uppercase tracking-wide">Variabel</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Variabel</p>
                       {selectedTemplate.variables.map(v => (
                         <div key={v.name}>
-                          <label className="flex items-center gap-1.5 text-gray-600 text-xs mb-1.5">
-                            <code className="bg-gray-100 text-gray-700 rounded px-1.5 py-0.5 font-mono">{`{${v.name}}`}</code>
+                          <label className="mb-1.5 flex items-center gap-1.5 text-xs text-slate-600">
+                            <code className="rounded bg-[#eef1ff] px-1.5 py-0.5 font-mono text-[#4358d8]">{`{${v.name}}`}</code>
                             {v.isRequired && <span className="text-red-400 font-medium">*</span>}
-                            {v.description && <span className="text-gray-400">· {v.description}</span>}
+                            {v.description && <span className="text-slate-400">· {v.description}</span>}
                           </label>
                           <input
                             value={templateVariables[v.name] ?? ""}
@@ -497,18 +497,18 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
           {msgType !== "text" && msgType !== "template" && (
             <>
               <div className="mb-3">
-                <label className="text-gray-500 text-xs font-medium block mb-1.5">
+                <label className="mb-1.5 block text-xs font-medium text-slate-500">
                   URL {msgType === "image" ? "Gambar" : msgType === "video" ? "Video" : "File"}
                 </label>
                 <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." className={inputCls} />
               </div>
               <div className="mb-3">
-                <label className="text-gray-500 text-xs font-medium block mb-1.5">Caption (opsional)</label>
+                <label className="mb-1.5 block text-xs font-medium text-slate-500">Caption (opsional)</label>
                 <input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Caption..." className={inputCls} />
               </div>
               {msgType === "document" && (
                 <div className="mb-3">
-                  <label className="text-gray-500 text-xs font-medium block mb-1.5">Nama File (opsional)</label>
+                  <label className="mb-1.5 block text-xs font-medium text-slate-500">Nama File (opsional)</label>
                   <input value={filename} onChange={(e) => setFilename(e.target.value)} placeholder="dokumen.pdf" className={inputCls} />
                 </div>
               )}
@@ -518,10 +518,10 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
           {result && (
             <div className={cn(
               "rounded-xl px-4 py-3 mb-4 flex items-center gap-2",
-              result.ok ? "bg-[#25d366]/10 border border-[#25d366]/20" : "bg-red-50 border border-red-200"
+              result.ok ? "border border-[#cfd7ff] bg-[#eef1ff]" : "bg-red-50 border border-red-200"
             )}>
-              <div className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", result.ok ? "bg-[#25d366]" : "bg-red-500")} />
-              <p className={result.ok ? "text-[#128C7E] text-sm font-medium" : "text-red-600 text-sm"}>
+              <div className={cn("h-1.5 w-1.5 flex-shrink-0 rounded-full", result.ok ? "bg-[#546dfe]" : "bg-red-500")} />
+              <p className={result.ok ? "text-sm font-medium text-[#4358d8]" : "text-sm text-red-600"}>
                 {result.msg}
               </p>
             </div>
@@ -530,7 +530,7 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
           <button
             onClick={handleSend}
             disabled={!connected || sending}
-            className="w-full flex items-center justify-center gap-2 bg-[#25d366] hover:bg-[#22c55e] text-white py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-50 shadow-sm shadow-[#25d366]/20"
+            className="app-button-primary w-full disabled:opacity-50"
           >
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             {sending ? "Mengirim..." : "Kirim Pesan"}
@@ -540,9 +540,9 @@ function SendTab({ numberId, connected, initialTo = "" }: { numberId: string; co
         {/* ── WA Preview ── */}
         {showPreview && (
           <div className="flex flex-col">
-            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-2 px-0.5">Preview WhatsApp</p>
+            <p className="mb-2 px-0.5 text-xs font-semibold uppercase tracking-wide text-slate-400">Preview WhatsApp</p>
             {/* Phone frame */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex-1">
+            <div className="app-card flex-1 overflow-hidden">
               {/* WA chat header */}
               <div className="bg-[#128C7E] px-4 py-3 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
@@ -598,12 +598,6 @@ function WebhookTab({ numberId, initialUrl }: { numberId: string; initialUrl: st
   const [saved, setSaved] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
 
-  useEffect(() => {
-    fetch(`/api/numbers/${numberId}/status`)
-      .then((r) => r.json())
-      .then((d) => setWebhookUrl(d.webhookUrl ?? ""));
-  }, [numberId]);
-
   const save = async () => {
     setSaving(true);
     await fetch(`/api/numbers/${numberId}/webhook`, {
@@ -616,13 +610,13 @@ function WebhookTab({ numberId, initialUrl }: { numberId: string; initialUrl: st
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const inputCls = "flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-50 transition-colors";
+  const inputCls = "app-input flex-1";
 
   return (
     <div className="max-w-xl mx-auto space-y-4">
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-        <h2 className="text-gray-800 font-medium text-sm mb-4 flex items-center gap-2">
-          <Webhook className="w-4 h-4 text-[#25d366]" />
+      <div className="app-card p-5">
+        <h2 className="mb-4 flex items-center gap-2 text-sm font-medium text-slate-800">
+          <Webhook className="w-4 h-4 text-[#546dfe]" />
           Webhook URL
         </h2>
         <div className="flex gap-3">
@@ -636,10 +630,10 @@ function WebhookTab({ numberId, initialUrl }: { numberId: string; initialUrl: st
             onClick={save}
             disabled={saving}
             className={cn(
-              "px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+              "rounded-lg px-4 py-2.5 text-sm font-medium transition-all",
               saved
-                ? "bg-[#25d366] text-white"
-                : "bg-gray-900 hover:bg-gray-700 text-white"
+                ? "bg-[#546dfe] text-white"
+                : "bg-slate-900 text-white hover:bg-slate-700"
             )}
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? "Saved!" : "Save"}
@@ -650,49 +644,49 @@ function WebhookTab({ numberId, initialUrl }: { numberId: string; initialUrl: st
         </p>
 
         <div className="mt-4 space-y-3">
-          <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
-            <p className="text-gray-500 text-xs font-mono mb-1">Teks (<code className="text-gray-700">conversation</code>)</p>
-            <pre className="text-green-700 text-xs font-mono overflow-x-auto">{`{ "event": "message", "data": {
+          <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-3">
+            <p className="mb-1 text-xs font-mono text-slate-500">Teks (<code className="text-slate-700">conversation</code>)</p>
+            <pre className="overflow-x-auto text-xs font-mono text-[#4358d8]">{`{ "event": "message", "data": {
   "from": "628xxx@s.whatsapp.net", "fromMe": false,
   "type": "conversation", "text": "Halo!", "timestamp": 1234567890
 }}`}</pre>
           </div>
-          <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
-            <p className="text-gray-500 text-xs font-mono mb-1">Gambar / Video / Stiker</p>
-            <pre className="text-green-700 text-xs font-mono overflow-x-auto">{`{ "event": "message", "data": {
+          <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-3">
+            <p className="mb-1 text-xs font-mono text-slate-500">Gambar / Video / Stiker</p>
+            <pre className="overflow-x-auto text-xs font-mono text-[#4358d8]">{`{ "event": "message", "data": {
   "from": "628xxx@s.whatsapp.net", "type": "imageMessage",
   "text": "caption jika ada",
   "media": { "url": "https://mmg.whatsapp.net/...",
     "mimetype": "image/jpeg", "fileSize": 123456 }
 }}`}</pre>
           </div>
-          <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
-            <p className="text-gray-500 text-xs font-mono mb-1">Audio / Voice note</p>
-            <pre className="text-green-700 text-xs font-mono overflow-x-auto">{`{ "event": "message", "data": {
+          <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-3">
+            <p className="mb-1 text-xs font-mono text-slate-500">Audio / Voice note</p>
+            <pre className="overflow-x-auto text-xs font-mono text-[#4358d8]">{`{ "event": "message", "data": {
   "type": "audioMessage",
   "media": { "url": "...", "mimetype": "audio/ogg; codecs=opus",
     "seconds": 12, "ptt": true }
 }}`}</pre>
           </div>
-          <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
-            <p className="text-gray-500 text-xs font-mono mb-1">Dokumen / File</p>
-            <pre className="text-green-700 text-xs font-mono overflow-x-auto">{`{ "event": "message", "data": {
+          <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-3">
+            <p className="mb-1 text-xs font-mono text-slate-500">Dokumen / File</p>
+            <pre className="overflow-x-auto text-xs font-mono text-[#4358d8]">{`{ "event": "message", "data": {
   "type": "documentMessage",
   "media": { "url": "...", "mimetype": "application/pdf",
     "filename": "dokumen.pdf", "fileSize": 204800 }
 }}`}</pre>
           </div>
-          <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
-            <p className="text-gray-500 text-xs font-mono mb-1">Lokasi / Maps</p>
-            <pre className="text-green-700 text-xs font-mono overflow-x-auto">{`{ "event": "message", "data": {
+          <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-3">
+            <p className="mb-1 text-xs font-mono text-slate-500">Lokasi / Maps</p>
+            <pre className="overflow-x-auto text-xs font-mono text-[#4358d8]">{`{ "event": "message", "data": {
   "type": "locationMessage",
   "location": { "latitude": -6.2088, "longitude": 106.8456,
     "name": "Jakarta", "address": "..." }
 }}`}</pre>
           </div>
-          <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
-            <p className="text-gray-500 text-xs font-mono mb-1">Kontak</p>
-            <pre className="text-green-700 text-xs font-mono overflow-x-auto">{`{ "event": "message", "data": {
+          <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-3">
+            <p className="mb-1 text-xs font-mono text-slate-500">Kontak</p>
+            <pre className="overflow-x-auto text-xs font-mono text-[#4358d8]">{`{ "event": "message", "data": {
   "type": "contactMessage",
   "contact": { "displayName": "John Doe", "vcard": "BEGIN:VCARD..." }
 }}`}</pre>
@@ -701,11 +695,11 @@ function WebhookTab({ numberId, initialUrl }: { numberId: string; initialUrl: st
       </div>
 
       {messages.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-          <h2 className="text-gray-800 font-medium text-sm mb-3">Incoming Messages</h2>
+        <div className="app-card p-5">
+          <h2 className="mb-3 text-sm font-medium text-slate-800">Incoming Messages</h2>
           <div className="space-y-2">
             {messages.map((msg) => (
-              <div key={msg.id} className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+              <div key={msg.id} className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-3">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500 text-xs font-mono">{msg.toFrom}</span>
                   <span className="text-gray-400 text-xs">{new Date(msg.createdAt).toLocaleTimeString()}</span>
@@ -758,7 +752,7 @@ function GroupsTab({ numberId, connected, onSendTo }: { numberId: string; connec
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       {!connected && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3">
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3">
           <p className="text-yellow-700 text-sm">Connect your WhatsApp first to view groups.</p>
         </div>
       )}
@@ -770,7 +764,7 @@ function GroupsTab({ numberId, connected, onSendTo }: { numberId: string; connec
         <button
           onClick={fetchGroups}
           disabled={!connected || loading}
-          className="flex items-center gap-1.5 bg-[#25d366] hover:bg-[#22c55e] disabled:opacity-50 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all"
+          className="app-button-primary disabled:opacity-50"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
           {loading ? "Loading..." : "Load Groups"}
@@ -778,17 +772,17 @@ function GroupsTab({ numberId, connected, onSendTo }: { numberId: string; connec
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
           <p className="text-red-600 text-sm">{error}</p>
         </div>
       )}
 
       {groups.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-2xl divide-y divide-gray-100 shadow-sm">
+        <div className="app-card divide-y divide-[#eef3f8]">
           {groups.map((g) => (
             <div key={g.id} className="px-5 py-4 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
-                <Users className="w-5 h-5 text-[#25d366]" />
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#eef1ff]">
+                <Users className="h-5 w-5 text-[#546dfe]" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-gray-800 font-medium text-sm">{g.name}</p>
@@ -801,14 +795,14 @@ function GroupsTab({ numberId, connected, onSendTo }: { numberId: string; connec
                     onClick={() => copyJid(g.id)}
                     className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
                   >
-                    {copied === g.id ? <Check className="w-3.5 h-3.5 text-[#25d366]" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied === g.id ? <Check className="w-3.5 h-3.5 text-[#546dfe]" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
                 <p className="text-gray-400 text-xs mt-0.5">{g.participantCount} members</p>
               </div>
               <button
                 onClick={() => onSendTo(g.id)}
-                className="flex items-center gap-1.5 bg-[#25d366] hover:bg-[#22c55e] text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex-shrink-0"
+                className="app-button-primary px-3 py-1.5 text-xs flex-shrink-0"
               >
                 <Send className="w-3.5 h-3.5" />
                 Send
@@ -819,8 +813,8 @@ function GroupsTab({ numberId, connected, onSendTo }: { numberId: string; connec
       )}
 
       {groups.length === 0 && !loading && !error && connected && (
-        <div className="text-center py-16 bg-white border border-gray-200 rounded-2xl shadow-sm">
-          <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+        <div className="app-card py-16 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-[#f3f5fb]">
             <Users className="w-8 h-8 text-gray-400" />
           </div>
           <p className="text-gray-400 font-medium">No groups loaded</p>
@@ -863,15 +857,15 @@ function ApiTab({ numberId, apiKey: initialKey, userApiKey: initialUserKey }: {
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       {/* api_key — User level */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-        <h2 className="text-gray-800 font-medium text-sm mb-1 flex items-center gap-2">
-          <Key className="w-4 h-4 text-[#25d366]" />
+      <div className="app-card p-5">
+        <h2 className="mb-1 flex items-center gap-2 text-sm font-medium text-slate-800">
+          <Key className="w-4 h-4 text-[#546dfe]" />
           API Key
         </h2>
         <p className="text-gray-400 text-xs mb-3">Milik akun kamu — sama untuk semua nomor WA</p>
         {userApiKey ? (
-          <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2.5 border border-gray-200 mb-2">
-            <code className="text-green-600 text-sm font-mono flex-1 truncate">{userApiKey}</code>
+          <div className="mb-2 flex items-center gap-2 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] px-3 py-2.5">
+            <code className="flex-1 truncate text-sm font-mono text-[#4358d8]">{userApiKey}</code>
             <CopyButton text={userApiKey} />
           </div>
         ) : (
@@ -880,7 +874,7 @@ function ApiTab({ numberId, apiKey: initialKey, userApiKey: initialUserKey }: {
         <button
           onClick={regenUserKey}
           disabled={regenUser}
-          className="flex items-center gap-1.5 text-gray-400 hover:text-gray-600 text-xs transition-colors mt-1"
+          className="mt-1 flex items-center gap-1.5 text-xs text-slate-400 transition-colors hover:text-slate-700"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${regenUser ? "animate-spin" : ""}`} />
           {userApiKey ? "Regenerate" : "Generate"}
@@ -888,20 +882,20 @@ function ApiTab({ numberId, apiKey: initialKey, userApiKey: initialUserKey }: {
       </div>
 
       {/* number_key — per WaNumber */}
-      <div className="bg-white border border-blue-100 rounded-2xl p-5 shadow-sm">
-        <h2 className="text-gray-800 font-medium text-sm mb-1 flex items-center gap-2">
+      <div className="app-card-soft p-5">
+        <h2 className="mb-1 flex items-center gap-2 text-sm font-medium text-slate-800">
           <Key className="w-4 h-4 text-blue-500" />
           Number Key
         </h2>
         <p className="text-gray-400 text-xs mb-3">Khusus untuk nomor WA ini saja</p>
-        <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2.5 border border-gray-200 mb-2">
+        <div className="mb-2 flex items-center gap-2 rounded-lg border border-[#d8deef] bg-white px-3 py-2.5">
           <code className="text-blue-600 text-sm font-mono flex-1 truncate">{apiKey}</code>
           <CopyButton text={apiKey} />
         </div>
         <button
           onClick={regen}
           disabled={regenerating}
-          className="flex items-center gap-1.5 text-gray-400 hover:text-gray-600 text-xs transition-colors mt-1"
+          className="mt-1 flex items-center gap-1.5 text-xs text-slate-400 transition-colors hover:text-slate-700"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${regenerating ? "animate-spin" : ""}`} />
           Regenerate
@@ -909,9 +903,9 @@ function ApiTab({ numberId, apiKey: initialKey, userApiKey: initialUserKey }: {
       </div>
 
       {/* PHP Example */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-        <h2 className="text-gray-800 font-medium text-sm mb-3">Contoh PHP</h2>
-        <pre className="text-gray-700 text-xs font-mono overflow-x-auto whitespace-pre-wrap bg-gray-50 rounded-xl p-3 border border-gray-200">{`$data = [
+      <div className="app-card p-5">
+        <h2 className="mb-3 text-sm font-medium text-slate-800">Contoh PHP</h2>
+        <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-3 text-xs font-mono text-[#4358d8]">{`$data = [
   "api_key"    => "${userApiKey || "YOUR-API-KEY"}",
   "number_key" => "${apiKey}",
   "phone_no"   => "628123456789",
@@ -951,11 +945,12 @@ export default function NumberDetailPage() {
 
   const fetchInfo = useCallback(async () => {
     try {
-      const res = await fetch(`/api/numbers/${id}/status`);
+      const [res, meRes] = await Promise.all([
+        fetch(`/api/numbers/${id}/status`),
+        fetch("/api/auth/me"),
+      ]);
       if (!res.ok) { router.push("/numbers"); return; }
-      const data = await res.json();
-      const meRes = await fetch("/api/auth/me");
-      const meData = await meRes.json();
+      const [data, meData] = await Promise.all([res.json(), meRes.json()]);
       setInfo({ ...data, userApiKey: meData.apiKey ?? null });
     } catch { /* ignore */ }
   }, [id, router]);
@@ -1020,25 +1015,25 @@ export default function NumberDetailPage() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto max-w-5xl">
       {/* Header */}
       <div className="mb-6">
         <button
           onClick={() => router.push("/numbers")}
-          className="flex items-center gap-1.5 text-gray-400 hover:text-gray-600 text-sm mb-5 transition-colors"
+          className="mb-5 flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-slate-700"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Semua Nomor
         </button>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+        <div className="app-card p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className={cn(
-                "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0",
-                info.status === "connected" ? "bg-[#25d366]/10" : "bg-gray-100"
+                "flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg",
+                info.status === "connected" ? "bg-[#eef1ff]" : "bg-[#f3f5fb]"
               )}>
-                <MessageSquare className={cn("w-6 h-6", info.status === "connected" ? "text-[#25d366]" : "text-gray-400")} />
+                <MessageSquare className={cn("w-6 h-6", info.status === "connected" ? "text-[#546dfe]" : "text-slate-400")} />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">{info.label}</h1>
@@ -1053,7 +1048,7 @@ export default function NumberDetailPage() {
           {info.stats && (
             <div className="flex gap-4 mt-4 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#25d366]" />
+                <div className="h-2 w-2 rounded-full bg-[#546dfe]" />
                 <span className="text-gray-500 text-xs">{info.stats.sent.toLocaleString()} terkirim</span>
               </div>
               <div className="flex items-center gap-2">
@@ -1066,17 +1061,17 @@ export default function NumberDetailPage() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-1.5 mb-6 shadow-sm">
+      <div className="app-card mb-6 p-1.5">
         <div className="flex gap-1">
           {tabs.map(({ id: tabId, icon: Icon, label }) => (
             <button
               key={tabId}
               onClick={() => setActiveTab(tabId)}
               className={cn(
-                "flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all",
+                "flex-1 flex items-center justify-center gap-1.5 rounded-md py-2.5 text-sm font-medium transition-all",
                 activeTab === tabId
-                  ? "bg-[#25d366] text-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                  ? "bg-[#546dfe] text-white shadow-sm"
+                  : "text-slate-500 hover:bg-[#f7f9fd] hover:text-slate-700"
               )}
             >
               <Icon className="w-4 h-4" />

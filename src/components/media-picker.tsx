@@ -26,19 +26,19 @@ export function MediaPicker({
   const current = TYPES.find((t) => t.value === mediaType) ?? null;
 
   return (
-    <div className="border border-gray-200 rounded-2xl overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+    <div className="overflow-hidden rounded-lg border border-[#d8deef] bg-white">
+      <div className="flex items-center justify-between border-b border-[#e6eaf4] px-5 py-4">
         <div>
-          <h2 className="text-sm font-semibold text-gray-800">Lampiran Media</h2>
-          <p className="text-xs text-gray-400 mt-0.5">
-            URL bisa static atau pakai variabel: <code className="text-amber-600 font-mono">{"{pdf_url}"}</code>
+          <h2 className="text-sm font-semibold text-slate-800">Lampiran Media</h2>
+          <p className="mt-0.5 text-xs text-slate-400">
+            URL bisa static atau pakai variabel: <code className="font-mono text-[#546dfe]">{"{pdf_url}"}</code>
           </p>
         </div>
         {mediaType && (
           <button
             type="button"
             onClick={() => { onMediaTypeChange(null); onMediaUrlChange(""); onMediaFilenameChange(""); }}
-            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-[#f2f5fb] hover:text-slate-700"
             title="Hapus lampiran"
           >
             <X className="w-4 h-4" />
@@ -47,16 +47,16 @@ export function MediaPicker({
       </div>
 
       {/* Type selector */}
-      <div className="px-5 py-4 border-b border-gray-100">
+      <div className="border-b border-[#e6eaf4] px-5 py-4">
         <div className="flex gap-2">
           {/* No media */}
           <button
             type="button"
             onClick={() => { onMediaTypeChange(null); onMediaUrlChange(""); onMediaFilenameChange(""); }}
-            className={`flex-1 py-2.5 px-3 rounded-xl border text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all ${
               !mediaType
-                ? "border-gray-400 bg-gray-100 text-gray-800"
-                : "border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600"
+                ? "border-[#c7d1e6] bg-[#eef2fa] text-slate-800"
+                : "border-[#d8deef] text-slate-500 hover:border-[#c1ccdf] hover:text-slate-700"
             }`}
           >
             Teks saja
@@ -67,10 +67,10 @@ export function MediaPicker({
               key={value}
               type="button"
               onClick={() => onMediaTypeChange(value)}
-              className={`flex-1 py-2.5 px-3 rounded-xl border text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+              className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all ${
                 mediaType === value
-                  ? "border-green-500 bg-green-50 text-green-700"
-                  : "border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  ? "border-[#90a3ff] bg-[#eef1ff] text-[#546dfe]"
+                  : "border-[#d8deef] text-slate-500 hover:border-[#c1ccdf] hover:text-slate-700"
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -82,9 +82,9 @@ export function MediaPicker({
 
       {/* URL + Filename inputs (shown when a media type is selected) */}
       {mediaType && (
-        <div className="px-5 py-4 space-y-3 bg-white">
+        <div className="space-y-3 bg-white px-5 py-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">
+            <label className="mb-1.5 block text-xs font-medium text-slate-600">
               URL {current?.label}
               <span className="text-red-500 ml-0.5">*</span>
             </label>
@@ -93,37 +93,37 @@ export function MediaPicker({
               value={mediaUrl}
               onChange={(e) => onMediaUrlChange(e.target.value)}
               placeholder={`https://example.com/file.${mediaType === "image" ? "jpg" : mediaType === "video" ? "mp4" : "pdf"} atau {url_variable}`}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono"
+              className="app-input font-mono"
             />
-            <p className="text-[11px] text-gray-400 mt-1">
-              Format: <code className="text-amber-600">{"{nama_variable}"}</code> untuk URL dinamis per pengiriman
+            <p className="mt-1 text-[11px] text-slate-400">
+              Format: <code className="text-[#546dfe]">{"{nama_variable}"}</code> untuk URL dinamis per pengiriman
             </p>
           </div>
 
           {(mediaType === "file" || mediaType === "video") && (
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                Nama file <span className="text-gray-400 font-normal">(opsional)</span>
+              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                Nama file <span className="font-normal text-slate-400">(opsional)</span>
               </label>
               <input
                 type="text"
                 value={mediaFilename}
                 onChange={(e) => onMediaFilenameChange(e.target.value)}
                 placeholder={`Laporan.pdf atau {filename_variable}`}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono"
+                className="app-input font-mono"
               />
             </div>
           )}
 
           {/* Preview hint */}
-          <div className={`rounded-xl border px-4 py-3 flex items-center gap-3 text-sm ${
-            mediaType === "image" ? "bg-purple-50 border-purple-100 text-purple-700"
-            : mediaType === "video" ? "bg-pink-50 border-pink-100 text-pink-700"
-            : "bg-orange-50 border-orange-100 text-orange-700"
+          <div className={`flex items-center gap-3 rounded-lg border px-4 py-3 text-sm ${
+            mediaType === "image" ? "border-[#cfd7ea] bg-[#f5f7fd] text-[#546dfe]"
+            : mediaType === "video" ? "border-[#cfd7ea] bg-[#f5f7fd] text-[#546dfe]"
+            : "border-[#cfd7ea] bg-[#f5f7fd] text-[#546dfe]"
           }`}>
             {current && <current.icon className="w-5 h-5 flex-shrink-0" />}
             <div>
-              <p className="font-medium text-xs">
+              <p className="text-xs font-medium">
                 {mediaType === "image" && "Gambar akan dikirim dengan caption dari isi pesan"}
                 {mediaType === "video" && "Video akan dikirim dengan caption dari isi pesan"}
                 {mediaType === "file"  && "File akan dikirim sebagai dokumen dengan caption dari isi pesan"}

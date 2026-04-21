@@ -79,13 +79,13 @@ export function TemplateEditor({ value, onChange, variableNames = [], rows = 8, 
   }, [onChange]);
 
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-[#d8deef] bg-white">
 
       {/* ── Toolbar ── */}
-      <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 bg-gray-50 border-b border-gray-200">
+      <div className="flex flex-wrap items-center gap-0.5 border-b border-[#e6eaf4] bg-[#f7f9fd] px-3 py-2">
 
         {/* Format buttons */}
-        <div className="flex items-center gap-0.5 pr-2 mr-1 border-r border-gray-200">
+        <div className="mr-1 flex items-center gap-0.5 border-r border-[#d8deef] pr-2">
           <ToolBtn title="Bold (*text*)" onClick={() => wrapFormat("*", "*")}>
             <Bold className="w-3.5 h-3.5" />
           </ToolBtn>
@@ -102,15 +102,15 @@ export function TemplateEditor({ value, onChange, variableNames = [], rows = 8, 
 
         {/* Variable chips */}
         {variableNames.length > 0 && (
-          <div className="flex items-center gap-1 pr-2 mr-1 border-r border-gray-200">
-            <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Var:</span>
+          <div className="mr-1 flex items-center gap-1 border-r border-[#d8deef] pr-2">
+            <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">Var:</span>
             {variableNames.map((v) => (
               <button
                 key={v}
                 type="button"
                 title={`Insert {${v}}`}
                 onClick={() => insertAt(`{${v}}`)}
-                className="text-[11px] font-mono bg-amber-100 hover:bg-amber-200 text-amber-700 px-1.5 py-0.5 rounded transition-colors"
+                className="rounded-md bg-[#eef1ff] px-1.5 py-0.5 font-mono text-[11px] text-[#546dfe] transition-colors hover:bg-[#dde4ff]"
               >
                 {`{${v}}`}
               </button>
@@ -124,14 +124,14 @@ export function TemplateEditor({ value, onChange, variableNames = [], rows = 8, 
             <Smile className="w-3.5 h-3.5" />
           </ToolBtn>
           {showEmoji && (
-            <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-2 w-72">
+            <div className="absolute right-0 top-full z-50 mt-1 w-72 rounded-lg border border-[#d8deef] bg-white p-2 shadow-[0_12px_24px_-18px_rgba(15,23,42,0.28)]">
               <div className="grid grid-cols-10 gap-0.5">
                 {EMOJIS.map((em) => (
                   <button
                     key={em}
                     type="button"
                     onClick={() => { insertAt(em); setShowEmoji(false); }}
-                    className="text-lg hover:bg-gray-100 rounded p-0.5 leading-none transition-colors"
+                    className="rounded p-0.5 text-lg leading-none transition-colors hover:bg-[#f2f5fb]"
                   >
                     {em}
                   </button>
@@ -149,25 +149,25 @@ export function TemplateEditor({ value, onChange, variableNames = [], rows = 8, 
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
         placeholder={placeholder ?? "Tulis pesan template…\nContoh: Halo {nama}! Pesanan {kode_pesanan} sudah siap. 🎉"}
-        className="w-full px-4 py-3 text-sm text-gray-800 placeholder-gray-400 font-mono resize-y focus:outline-none bg-white"
+        className="w-full resize-y bg-white px-4 py-3 font-mono text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none"
         onClick={() => setShowEmoji(false)}
       />
 
       {/* ── Format hint ── */}
-      <div className="px-4 py-2 bg-gray-50 border-t border-gray-100 flex flex-wrap items-center gap-3">
-        <span className="text-[11px] text-gray-400">Format WA:</span>
+      <div className="flex flex-wrap items-center gap-3 border-t border-[#eef2f7] bg-[#fafbfe] px-4 py-2">
+        <span className="text-[11px] text-slate-400">Format WA:</span>
         {[["*bold*","font-bold"],["_italic_","italic"],["~coret~","line-through"],["```mono```","font-mono text-xs"]].map(([ex, cls]) => (
-          <span key={ex} className={`text-[11px] text-gray-500 ${cls}`}>{ex}</span>
+          <span key={ex} className={`text-[11px] text-slate-500 ${cls}`}>{ex}</span>
         ))}
-        <span className="text-[11px] text-gray-400 ml-auto">Variabel: <code className="text-amber-600">{"{nama_variable}"}</code></span>
+        <span className="ml-auto text-[11px] text-slate-400">Variabel: <code className="text-[#546dfe]">{"{nama_variable}"}</code></span>
       </div>
 
       {/* ── Preview ── */}
-      <div className="border-t border-gray-200">
+      <div className="border-t border-[#d8deef]">
         <button
           type="button"
           onClick={() => setShowPreview(!showPreview)}
-          className="w-full flex items-center justify-between px-4 py-2.5 text-xs font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+          className="flex w-full items-center justify-between px-4 py-2.5 text-xs font-medium text-slate-500 transition-colors hover:bg-[#fafbfe]"
         >
           <span>Preview</span>
           {showPreview ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -175,14 +175,14 @@ export function TemplateEditor({ value, onChange, variableNames = [], rows = 8, 
         {showPreview && (
           <div className="px-4 pb-4">
             {value.trim() ? (
-              <div className="bg-[#dcf8c6] rounded-xl rounded-tl-none px-4 py-3 max-w-sm text-sm text-gray-800 shadow-sm">
+              <div className="max-w-sm rounded-lg border border-[#d8deef] bg-[#f7f9fd] px-4 py-3 text-sm text-slate-800">
                 <div
                   dangerouslySetInnerHTML={{ __html: renderPreview(value) }}
                   className="leading-relaxed"
                 />
               </div>
             ) : (
-              <p className="text-gray-400 text-xs italic">Tulis pesan untuk melihat preview…</p>
+              <p className="text-xs italic text-slate-400">Tulis pesan untuk melihat preview…</p>
             )}
           </div>
         )}
@@ -197,7 +197,7 @@ function ToolBtn({ children, onClick, title }: { children: React.ReactNode; onCl
       type="button"
       title={title}
       onClick={onClick}
-      className="p-1.5 rounded text-gray-500 hover:text-gray-800 hover:bg-gray-200 transition-colors"
+      className="rounded p-1.5 text-slate-500 transition-colors hover:bg-[#e9edf6] hover:text-slate-800"
     >
       {children}
     </button>

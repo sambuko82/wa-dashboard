@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from "react";
 import {
-  BarChart3, Users, Phone, Wifi, WifiOff,
-  Loader2, RefreshCw, Activity,
+  Activity,
+  BarChart3,
+  Loader2,
+  Phone,
+  RefreshCw,
+  Users,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
 import type { ConnectionStatus } from "@/lib/wa-client";
@@ -28,22 +34,22 @@ function StatCard({
   label,
   value,
   icon: Icon,
-  accent,
+  tone,
 }: {
   label: string;
   value: number;
   icon: React.ElementType;
-  accent: string;
+  tone: string;
 }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-gray-500 text-sm">{label}</span>
-        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${accent}`}>
-          <Icon className="w-4 h-4 text-gray-600" />
+    <div className="app-card p-6">
+      <div className="mb-5 flex items-center justify-between">
+        <span className="text-sm font-semibold text-slate-500">{label}</span>
+        <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${tone}`}>
+          <Icon className="h-5 w-5 text-slate-900" />
         </div>
       </div>
-      <p className="text-3xl font-bold text-gray-900">{value}</p>
+      <p className="text-4xl font-black tracking-[-0.05em] text-slate-900">{value}</p>
     </div>
   );
 }
@@ -72,8 +78,8 @@ export default function AdminOverviewPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-300" />
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="h-8 w-8 animate-spin text-[#546dfe]" />
       </div>
     );
   }
@@ -81,60 +87,65 @@ export default function AdminOverviewPage() {
   if (!data) return null;
 
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+    <div className="space-y-8">
+      <section className="app-page-header">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <BarChart3 className="w-6 h-6 text-[#25d366]" />
+          <span className="app-kicker">Admin monitor</span>
+          <h1 className="app-page-title mt-4 flex items-center gap-3">
+            <BarChart3 className="h-7 w-7 text-[#546dfe]" />
             System Overview
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Real-time monitoring of all connections</p>
+          <p className="app-page-description">
+            Real-time summary of users, connections, and active WhatsApp numbers.
+          </p>
         </div>
         <button
           onClick={fetchData}
           disabled={refreshing}
-          className="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50 px-3 py-2 rounded-lg text-sm transition-colors"
+          className="app-button-secondary"
         >
-          <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+          <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
           Refresh
         </button>
-      </div>
+      </section>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <StatCard label="Total Users" value={data.stats.totalUsers} icon={Users} accent="bg-blue-50" />
-        <StatCard label="WA Numbers" value={data.stats.totalNumbers} icon={Phone} accent="bg-green-50" />
-        <StatCard label="Connected" value={data.stats.connectedNumbers} icon={Wifi} accent="bg-purple-50" />
-      </div>
+      <section className="grid gap-5 md:grid-cols-3">
+        <StatCard label="Total users" value={data.stats.totalUsers} icon={Users} tone="bg-[#fee2e2]" />
+        <StatCard label="WA numbers" value={data.stats.totalNumbers} icon={Phone} tone="bg-[#fef3c7]" />
+        <StatCard label="Connected" value={data.stats.connectedNumbers} icon={Wifi} tone="bg-[#eef1ff]" />
+      </section>
 
-      {/* Numbers table */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h2 className="text-gray-800 font-semibold flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#25d366]" />
-            All WA Numbers
-          </h2>
+      <section className="app-card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-[#eef3f8] px-6 py-5">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+              Connected assets
+            </p>
+            <h2 className="mt-2 flex items-center gap-2 text-2xl font-black tracking-[-0.04em] text-slate-900">
+              <Activity className="h-5 w-5 text-[#546dfe]" />
+              All WA Numbers
+            </h2>
+          </div>
         </div>
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-[#eef3f8]">
           {data.numbers.length === 0 ? (
-            <div className="py-10 text-center text-gray-400 text-sm">No WA numbers yet</div>
+            <div className="py-16 text-center text-sm text-slate-400">No WA numbers yet</div>
           ) : (
             data.numbers.map((n) => (
-              <div key={n.id} className="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
-                <div className="flex-shrink-0">
+              <div key={n.id} className="flex items-center gap-4 px-6 py-5 transition hover:bg-[#f8fafc]">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#f8fafc]">
                   {n.status === "connected" ? (
-                    <Wifi className="w-4 h-4 text-[#25d366]" />
+                    <Wifi className="h-5 w-5 text-[#546dfe]" />
                   ) : (
-                    <WifiOff className="w-4 h-4 text-red-400" />
+                    <WifiOff className="h-5 w-5 text-red-400" />
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-gray-800 text-sm font-medium">{n.label}</p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-base font-bold text-slate-900">{n.label}</p>
                     <StatusBadge status={n.status} />
                   </div>
-                  <p className="text-gray-500 text-xs">
+                  <p className="mt-1 text-sm text-slate-500">
                     Owner: {n.user.name} ({n.user.email})
                     {n.phoneNumber && ` · +${n.phoneNumber}`}
                   </p>
@@ -143,7 +154,7 @@ export default function AdminOverviewPage() {
             ))
           )}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

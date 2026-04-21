@@ -17,45 +17,115 @@ enum Direction {
 }
 
 model User {
-  id        String     @id @default(cuid())
-  email     String     @unique
-  password  String
-  name      String
-  role      Role       @default(USER)
-  apiKey    String?    @unique
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  waNumbers WaNumber[]
-  templates Template[]
+  id             String          @id @default(cuid())
+  email          String          @unique
+  password       String
+  name           String
+  role           Role            @default(USER)
+  apiKey         String?         @unique
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  waNumbers      WaNumber[]
+  templates      Template[]
+  labels         Label[]
+  pipelineStages PipelineStage[]
 }
 
 model WaNumber {
-  id          String       @id @default(cuid())
-  userId      String
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  label       String
-  apiKey      String       @unique
-  webhookUrl  String?
-  phoneNumber String?
+  id                 String          @id @default(cuid())
+  userId             String
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label              String
+  apiKey             String          @unique
+  webhookUrl         String?
+  phoneNumber        String?
   authDir            String
-  authState          Json?        // Baileys session backup for cross-Lambda restore (Vercel)
-  connectionActiveAt DateTime?    // Heartbeat: updated every 30 s while connected
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  messages    MessageLog[]
+  authState          Json? // Baileys session backup for cross-Lambda restore (Vercel)
+  connectionActiveAt DateTime? // Heartbeat: updated every 30 s while connected
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  messages           MessageLog[]
+  contacts           Contact[]
 }
 
 model MessageLog {
-  id        String    @id @default(cuid())
-  numberId  String
-  number    WaNumber  @relation(fields: [numberId], references: [id], onDelete: Cascade)
-  direction Direction
-  toFrom    String
-  content   String?
-  mediaType String?
+  id         String    @id @default(cuid())
+  numberId   String
+  number     WaNumber  @relation(fields: [numberId], references: [id], onDelete: Cascade)
+  direction  Direction
+  toFrom     String
+  content    String?
+  mediaType  String?
   templateId String?
   template   Template? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  contactId  String?
+  contact    Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  createdAt  DateTime  @default(now())
+}
+
+model Contact {
+  id              String         @id @default(cuid())
+  waNumberId      String
+  waNumber        WaNumber       @relation(fields: [waNumberId], references: [id], onDelete: Cascade)
+  phoneNumber     String
+  name            String?
+  email           String?
+  avatarUrl       String?
+  notes           String?        @db.Text
+  customFields    Json?
+  labels          Label[]        @relation("ContactLabels")
+  adminNotes      ContactNote[]
+  messages        MessageLog[]
+  pipelineStageId String?
+  pipelineStage   PipelineStage? @relation(fields: [pipelineStageId], references: [id], onDelete: SetNull)
+  reminders       Reminder[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([waNumberId, phoneNumber])
+}
+
+model PipelineStage {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  order     Int       @default(0)
+  color     String    @default("#25d366")
+  contacts  Contact[]
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Reminder {
+  id          String   @id @default(cuid())
+  contactId   String
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  description String   @db.Text
+  dueDate     DateTime
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Label {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  color     String    @default("#25d366")
+  contacts  Contact[] @relation("ContactLabels")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model ContactNote {
+  id        String   @id @default(cuid())
+  contactId String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Template {

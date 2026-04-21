@@ -2,7 +2,20 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Edit, Trash2, FileText, Search, Eye } from "lucide-react";
+import {
+  CheckCircle2,
+  File,
+  FileText,
+  ImageIcon,
+  Loader2,
+  MessageSquare,
+  Plus,
+  Search,
+  Trash2,
+  Video,
+  XCircle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TemplateVar {
   id: string;
@@ -18,6 +31,7 @@ interface Template {
   content: string;
   description?: string;
   isActive: boolean;
+  mediaType?: "image" | "video" | "document" | null;
   createdAt: string;
   variables: TemplateVar[];
 }
@@ -27,7 +41,9 @@ export default function TemplatesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => { fetchTemplates(); }, []);
+  useEffect(() => {
+    fetchTemplates();
+  }, []);
 
   const fetchTemplates = async () => {
     try {
@@ -39,131 +55,162 @@ export default function TemplatesPage() {
   };
 
   const deleteTemplate = async (id: string) => {
-    if (!confirm("Hapus template ini?")) return;
+    if (!confirm("Remove this template? This action cannot be reversed.")) return;
     const res = await fetch(`/api/templates/${id}`, { method: "DELETE" });
     if (res.ok) setTemplates((prev) => prev.filter((t) => t.id !== id));
-    else alert("Gagal menghapus template");
   };
 
   const filtered = templates.filter((t) =>
     t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (t.description ?? "").toLowerCase().includes(searchTerm.toLowerCase())
+    (t.description ?? "").toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" />
+      <div className="flex flex-col items-center justify-center py-32 text-slate-400">
+        <Loader2 className="mb-4 h-9 w-9 animate-spin text-[#546dfe]" />
+        <p className="text-sm font-semibold">Loading message templates...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-8 animate-in fade-in duration-700 pb-10">
+      <section className="app-page-header">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Templates</h1>
-          <p className="text-gray-500 text-sm mt-0.5">Buat dan kelola template pesan WhatsApp dengan variabel dinamis</p>
-        </div>
-        <Link
-          href="/templates/new"
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Template Baru
-        </Link>
-      </div>
-
-      {/* Search */}
-      <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 mb-4 flex items-center gap-3">
-        <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
-        <input
-          type="text"
-          placeholder="Cari template…"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none"
-        />
-      </div>
-
-      {/* List */}
-      {filtered.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-2xl py-16 text-center">
-          <FileText className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">
-            {searchTerm ? "Template tidak ditemukan" : "Belum ada template"}
+          <span className="app-kicker">Message library</span>
+          <h1 className="app-page-title mt-4">Templates</h1>
+          <p className="app-page-description">
+            Organize reusable messages, media payloads, and variable-driven
+            content in a cleaner content library.
           </p>
-          {!searchTerm && (
-            <Link href="/templates/new" className="text-green-600 hover:text-green-700 text-sm mt-2 inline-block">
-              Buat template pertama →
-            </Link>
-          )}
         </div>
+        <Link href="/templates/new" className="app-button-primary">
+          <Plus className="h-4 w-4" />
+          Create template
+        </Link>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-[1fr_auto]">
+        <div className="app-card flex items-center gap-3 p-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#f8fafc]">
+            <Search className="h-5 w-5 text-slate-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search templates by name, description, or content..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
+          />
+        </div>
+        <div className="app-card-soft flex items-center gap-4 px-5 py-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+              Total templates
+            </p>
+            <p className="mt-2 text-3xl font-black tracking-[-0.05em] text-slate-900">
+              {templates.length}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {filtered.length === 0 ? (
+        <section className="app-card py-24 text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[1.25rem] bg-[#eef1ff]">
+            <FileText className="h-10 w-10 text-[#546dfe]" />
+          </div>
+          <h2 className="mt-6 text-2xl font-black tracking-[-0.04em] text-slate-900">
+            {searchTerm ? "No matching templates" : "Template library is empty"}
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-500">
+            {searchTerm
+              ? "Try a broader keyword or clear the filter to see all templates."
+              : "Create your first reusable message template to keep campaigns and support replies consistent."}
+          </p>
+        </section>
       ) : (
-        <div className="space-y-3">
+        <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((t) => (
-            <div key={t.id} className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-gray-300 transition-colors">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-gray-900 text-sm">{t.name}</h3>
-                    {!t.isActive && (
-                      <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">Nonaktif</span>
-                    )}
-                  </div>
-                  {t.description && (
-                    <p className="text-gray-500 text-xs mb-2">{t.description}</p>
+            <article key={t.id} className="app-card flex h-full flex-col p-6">
+              <div className="mb-6 flex items-start justify-between gap-3">
+                <div
+                  className={cn(
+                    "flex h-12 w-12 items-center justify-center rounded-xl",
+                    t.isActive ? "bg-[#eef1ff]" : "bg-[#f8fafc]",
                   )}
-
-                  {/* Content preview */}
-                  <div className="bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5 mb-3">
-                    <p className="text-gray-700 text-xs font-mono whitespace-pre-wrap line-clamp-3">{t.content}</p>
-                  </div>
-
-                  {/* Footer meta */}
-                  <div className="flex items-center gap-3 text-xs text-gray-400">
-                    {t.variables.length > 0 && (
-                      <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
-                        {t.variables.length} variabel
-                      </span>
-                    )}
-                    <span>·</span>
-                    <span>{new Date(t.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</span>
-                    {t.variables.length > 0 && (
-                      <>
-                        <span>·</span>
-                        <span className="flex flex-wrap gap-1">
-                          {t.variables.map((v) => (
-                            <code key={v.id} className="bg-amber-50 text-amber-600 px-1 rounded font-mono">{`{${v.name}}`}</code>
-                          ))}
-                        </span>
-                      </>
-                    )}
-                  </div>
+                >
+                  {t.mediaType === "image" ? (
+                    <ImageIcon className="h-5 w-5 text-[#546dfe]" />
+                  ) : t.mediaType === "video" ? (
+                    <Video className="h-5 w-5 text-sky-600" />
+                  ) : t.mediaType === "document" ? (
+                    <File className="h-5 w-5 text-amber-600" />
+                  ) : (
+                    <MessageSquare className="h-5 w-5 text-slate-500" />
+                  )}
                 </div>
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold",
+                    t.isActive
+                      ? "border-[#cfd7ff] bg-[#eef1ff] text-[#4358d8]"
+                      : "border-[#e2e8f0] bg-[#f8fafc] text-slate-500",
+                  )}
+                >
+                  {t.isActive ? (
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  ) : (
+                    <XCircle className="h-3.5 w-3.5" />
+                  )}
+                  {t.isActive ? "Active" : "Disabled"}
+                </span>
+              </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <Link href={`/templates/${t.id}`} className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" title="Detail">
-                    <Eye className="w-4 h-4" />
+              <h2 className="text-2xl font-black tracking-[-0.04em] text-slate-900">
+                {t.name}
+              </h2>
+              {t.description && (
+                <p className="mt-3 text-sm leading-6 text-slate-500">{t.description}</p>
+              )}
+
+              <div className="mt-5 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4">
+                <p className="line-clamp-4 text-sm leading-6 text-slate-600">{t.content}</p>
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {t.variables.length > 0 ? (
+                  t.variables.map((v) => (
+                    <span
+                      key={v.id}
+                      className="rounded-full border border-[#f2e2af] bg-[#fff7dc] px-3 py-1 text-xs font-semibold text-[#8c5a17]"
+                    >
+                      {v.name}
+                    </span>
+                  ))
+                ) : (
+                  <span className="app-pill">Static content</span>
+                )}
+              </div>
+
+              <div className="mt-6 flex items-center justify-between border-t border-[#eef3f8] pt-5">
+                <p className="text-xs font-medium text-slate-400">
+                  Updated {new Date(t.createdAt).toLocaleDateString()}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Link href={`/templates/${t.id}/edit`} className="app-button-secondary px-4 py-2.5">
+                    Edit
                   </Link>
-                  <Link href={`/templates/${t.id}/edit`} className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
-                    <Edit className="w-4 h-4" />
-                  </Link>
-                  <button
-                    onClick={() => deleteTemplate(t.id)}
-                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Hapus"
-                  >
-                    <Trash2 className="w-4 h-4" />
+                  <button onClick={() => deleteTemplate(t.id)} className="app-icon-button">
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               </div>
-            </div>
+            </article>
           ))}
-        </div>
+        </section>
       )}
     </div>
   );

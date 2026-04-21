@@ -127,153 +127,154 @@ export default function AdminUsersPage() {
     }
   };
 
-  const inputCls = "w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-50 transition-colors";
+  const inputCls = "app-input";
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+    <div className="space-y-5">
+      <div className="app-page-header">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Users className="w-6 h-6 text-[#25d366]" />
+          <span className="app-kicker">Administration</span>
+          <h1 className="app-page-title mt-4 flex items-center gap-3">
+            <Users className="h-6 w-6 text-[#546dfe]" />
             User Management
           </h1>
-          <p className="text-gray-500 text-sm mt-1">{users.length} user{users.length !== 1 ? "s" : ""} total</p>
+          <p className="app-page-description">
+            {users.length} user{users.length !== 1 ? "s" : ""} total across this workspace.
+          </p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-[#25d366] hover:bg-[#22c55e] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+          className="app-button-primary"
         >
-          <Plus className="w-4 h-4" />
-          New User
+          <Plus className="h-4 w-4" />
+          {showForm ? "Close Form" : "New User"}
         </button>
       </div>
 
-      {/* Create form */}
       {showForm && (
-        <form onSubmit={createUser} className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
-          <h2 className="text-gray-900 font-semibold mb-4">Create New User</h2>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+        <form onSubmit={createUser} className="app-card space-y-5 p-6">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">Create New User</h2>
+            <p className="mt-1 text-sm text-slate-500">Add a new team member to the CRM workspace.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="text-gray-600 text-xs font-medium block mb-1">Full Name</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Full Name</label>
               <input value={name} onChange={(e) => setName(e.target.value)} required placeholder="John Doe" className={inputCls} />
             </div>
             <div>
-              <label className="text-gray-600 text-xs font-medium block mb-1">Email</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Email</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="user@example.com" className={inputCls} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="text-gray-600 text-xs font-medium block mb-1">Password</label>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Password</label>
               <div className="relative">
                 <input type={showPass ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" className={inputCls + " pr-10"} />
-                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
                   {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
             <div>
-              <label className="text-gray-600 text-xs font-medium block mb-1">Role</label>
-              <select value={role} onChange={(e) => setRole(e.target.value as "USER" | "ADMIN")} className={inputCls}>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Role</label>
+              <select value={role} onChange={(e) => setRole(e.target.value as "USER" | "ADMIN")} className="app-select">
                 <option value="USER">User</option>
                 <option value="ADMIN">Admin</option>
               </select>
             </div>
           </div>
-          {formError && <p className="text-red-600 text-sm mb-3">{formError}</p>}
+          {formError && <p className="text-sm text-red-600">{formError}</p>}
           <div className="flex gap-3">
-            <button type="submit" disabled={creating} className="flex items-center gap-2 bg-[#25d366] hover:bg-[#22c55e] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-50">
+            <button type="submit" disabled={creating} className="app-button-primary disabled:opacity-50">
               {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               Create
             </button>
-            <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2.5 rounded-xl text-sm text-gray-500 hover:text-gray-700 border border-gray-200 hover:bg-gray-50 transition-all">
+            <button type="button" onClick={() => setShowForm(false)} className="app-button-secondary">
               Cancel
             </button>
           </div>
         </form>
       )}
 
-      {/* User list */}
       {loading ? (
         <div className="flex items-center justify-center h-40">
-          <Loader2 className="w-6 h-6 animate-spin text-gray-300" />
+          <Loader2 className="h-6 w-6 animate-spin text-slate-300" />
         </div>
       ) : (
         <div className="space-y-3">
           {users.map((u) => (
-            <div key={u.id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-              {/* User row */}
-              <div className="p-5 flex items-center gap-4">
-                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", u.role === "ADMIN" ? "bg-green-50" : "bg-blue-50")}>
-                  {u.role === "ADMIN" ? <Shield className="w-5 h-5 text-green-700" /> : <User className="w-5 h-5 text-blue-600" />}
+            <div key={u.id} className="app-card overflow-hidden">
+              <div className="flex items-center gap-4 p-5">
+                <div className={cn("flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg", u.role === "ADMIN" ? "bg-[#eef1ff]" : "bg-[#f3f6fb]")}>
+                  {u.role === "ADMIN" ? <Shield className="h-5 w-5 text-[#546dfe]" /> : <User className="h-5 w-5 text-slate-500" />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-gray-900 font-semibold text-sm">{u.name}</p>
-                    <span className={cn("text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded", u.role === "ADMIN" ? "bg-green-50 text-green-700" : "bg-blue-50 text-blue-600")}>
+                    <p className="text-sm font-semibold text-slate-900">{u.name}</p>
+                    <span className={cn("rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider", u.role === "ADMIN" ? "bg-[#eef1ff] text-[#546dfe]" : "bg-[#f2f5fb] text-slate-500")}>
                       {u.role}
                     </span>
                   </div>
-                  <p className="text-gray-500 text-xs">{u.email}</p>
-                  <p className="text-gray-400 text-xs mt-0.5">
+                  <p className="text-xs text-slate-500">{u.email}</p>
+                  <p className="mt-0.5 text-xs text-slate-400">
                     {u._count.waNumbers} WA number{u._count.waNumbers !== 1 ? "s" : ""} · Joined {new Date(u.createdAt).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => editId === u.id ? setEditId(null) : startEdit(u)}
-                    className={cn("p-2 rounded-lg transition-all", editId === u.id ? "bg-green-50 text-green-700" : "text-gray-400 hover:text-gray-600 hover:bg-gray-50")}
+                    className={cn("app-icon-button h-9 w-9", editId === u.id ? "border-[#b9c7ff] bg-[#eef1ff] text-[#546dfe]" : "")}
                   >
                     <Pencil className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => deleteUser(u.id, u.name)}
                     disabled={deleting === u.id}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
+                    className="app-icon-button h-9 w-9 text-slate-400 hover:text-red-500 disabled:opacity-50"
                   >
                     {deleting === u.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              {/* Inline edit form */}
               {editId === u.id && (
-                <div className="border-t border-gray-100 px-5 py-4 bg-gray-50">
-                  <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-3">Edit User</p>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
+                <div className="border-t border-[#e8edf6] bg-[#fafbfe] px-5 py-4">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Edit User</p>
+                  <div className="mb-3 grid gap-3 md:grid-cols-2">
                     <div>
-                      <label className="text-gray-500 text-xs block mb-1">Name</label>
+                      <label className="mb-1 block text-xs text-slate-500">Name</label>
                       <input value={editName} onChange={(e) => setEditName(e.target.value)} className={inputCls} />
                     </div>
                     <div>
-                      <label className="text-gray-500 text-xs block mb-1">Email</label>
+                      <label className="mb-1 block text-xs text-slate-500">Email</label>
                       <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className={inputCls} />
                     </div>
                     <div>
-                      <label className="text-gray-500 text-xs block mb-1">New Password <span className="text-gray-400">(kosongkan jika tidak diubah)</span></label>
+                      <label className="mb-1 block text-xs text-slate-500">New Password <span className="text-slate-400">(leave empty to keep current)</span></label>
                       <div className="relative">
                         <input type={editShowPass ? "text" : "password"} value={editPassword} onChange={(e) => setEditPassword(e.target.value)} placeholder="••••••••" className={inputCls + " pr-10"} />
-                        <button type="button" onClick={() => setEditShowPass(!editShowPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <button type="button" onClick={() => setEditShowPass(!editShowPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
                           {editShowPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                     <div>
-                      <label className="text-gray-500 text-xs block mb-1">Role</label>
-                      <select value={editRole} onChange={(e) => setEditRole(e.target.value as "USER" | "ADMIN")} className={inputCls}>
+                      <label className="mb-1 block text-xs text-slate-500">Role</label>
+                      <select value={editRole} onChange={(e) => setEditRole(e.target.value as "USER" | "ADMIN")} className="app-select">
                         <option value="USER">User</option>
                         <option value="ADMIN">Admin</option>
                       </select>
                     </div>
                   </div>
-                  {editError && <p className="text-red-600 text-xs mb-2">{editError}</p>}
+                  {editError && <p className="mb-2 text-xs text-red-600">{editError}</p>}
                   <div className="flex gap-2">
-                    <button onClick={() => saveEdit(u.id)} disabled={saving} className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-50">
+                    <button onClick={() => saveEdit(u.id)} disabled={saving} className="app-button-primary disabled:opacity-50">
                       {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                       Save
                     </button>
-                    <button onClick={() => setEditId(null)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-gray-500 hover:text-gray-700 border border-gray-200 hover:bg-gray-100 transition-all">
+                    <button onClick={() => setEditId(null)} className="app-button-secondary">
                       <X className="w-3.5 h-3.5" />
                       Cancel
                     </button>

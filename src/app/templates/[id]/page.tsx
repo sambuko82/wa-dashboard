@@ -2,7 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Edit, Trash2, Copy, Check, Image, FileText, Video } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Copy,
+  Edit,
+  FileText,
+  Image,
+  Trash2,
+  Video,
+} from "lucide-react";
 import Link from "next/link";
 
 interface Template {
@@ -26,18 +35,14 @@ interface Template {
   user: { id: string; name: string; email: string };
 }
 
-// Render WA formatting for preview
 function renderPreview(text: string): string {
-  let s = text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  let s = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   s = s
-    .replace(/```([\s\S]*?)```/g, '<code class="font-mono text-xs bg-gray-100 rounded px-0.5">$1</code>')
+    .replace(/```([\s\S]*?)```/g, '<code class="font-mono text-xs bg-[#eef1ff] rounded px-0.5">$1</code>')
     .replace(/\*([^*\n]+)\*/g, "<strong>$1</strong>")
     .replace(/_([^_\n]+)_/g, "<em>$1</em>")
     .replace(/~([^~\n]+)~/g, "<del>$1</del>")
-    .replace(/\{([^}]+)\}/g, '<span class="inline-block bg-amber-100 text-amber-700 font-mono text-xs rounded px-1 mx-0.5">{$1}</span>')
+    .replace(/\{([^}]+)\}/g, '<span class="inline-block bg-[#eef1ff] text-[#546dfe] font-mono text-xs rounded px-1 mx-0.5">{$1}</span>')
     .replace(/\n/g, "<br/>");
   return s;
 }
@@ -45,7 +50,6 @@ function renderPreview(text: string): string {
 export default function TemplateDetailPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
-
   const [template, setTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -74,169 +78,163 @@ export default function TemplateDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" />
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-[#546dfe]" />
       </div>
     );
   }
 
   if (!template) {
     return (
-      <div className="text-center py-16">
-        <p className="text-gray-500 text-sm">Template tidak ditemukan</p>
-        <Link href="/templates" className="text-green-600 hover:text-green-700 text-sm mt-2 inline-block">
-          ← Kembali ke Templates
+      <div className="py-16 text-center">
+        <p className="text-sm text-slate-500">Template not found</p>
+        <Link href="/templates" className="mt-2 inline-block text-sm font-medium text-[#546dfe]">
+          Back to templates
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <Link href="/templates" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
-        </Link>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-gray-900 truncate">{template.name}</h1>
-            {!template.isActive && (
-              <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-medium flex-shrink-0">Nonaktif</span>
-            )}
-          </div>
-          {template.description && <p className="text-gray-500 text-sm mt-0.5 truncate">{template.description}</p>}
-        </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <Link href={`/templates/${id}/edit`} className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-            <Edit className="w-4 h-4" />
+    <div className="mx-auto max-w-4xl space-y-5">
+      <div className="app-page-header">
+        <div className="flex items-start gap-3">
+          <Link href="/templates" className="app-icon-button mt-1 h-9 w-9">
+            <ArrowLeft className="h-4 w-4" />
           </Link>
-          <button onClick={deleteTemplate} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-            <Trash2 className="w-4 h-4" />
+          <div>
+            <span className="app-kicker">Templates</span>
+            <div className="mt-4 flex items-center gap-2">
+              <h1 className="app-page-title">{template.name}</h1>
+              {!template.isActive && (
+                <span className="rounded-md bg-[#f2f5fb] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Inactive
+                </span>
+              )}
+            </div>
+            {template.description && <p className="app-page-description">{template.description}</p>}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link href={`/templates/${id}/edit`} className="app-button-secondary">
+            <Edit className="h-4 w-4" />
+            Edit
+          </Link>
+          <button onClick={deleteTemplate} className="app-icon-button text-red-500 hover:text-red-600">
+            <Trash2 className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      <div className="space-y-4">
-
-        {/* Meta */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-5">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            {[
-              ["Template ID", template.id, true],
-              ["Dibuat oleh", template.user.name, false],
-              ["Dibuat", new Date(template.createdAt).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" }), false],
-              ["Diperbarui", new Date(template.updatedAt).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" }), false],
-            ].map(([label, val, mono]) => (
-              <div key={label as string}>
-                <p className="text-gray-400 text-xs mb-0.5">{label}</p>
-                <p className={`text-gray-800 truncate ${mono ? "font-mono text-xs" : ""}`}>{val}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-gray-800">Isi Pesan</h2>
-            <button
-              onClick={() => copy(template.content)}
-              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 border border-gray-200 hover:border-gray-300 px-2.5 py-1.5 rounded-lg transition-colors"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-              {copied ? "Tersalin!" : "Salin"}
-            </button>
-          </div>
-          {/* Raw */}
-          <div className="px-5 py-4 border-b border-gray-100">
-            <p className="text-[11px] text-gray-400 uppercase tracking-wider font-medium mb-2">Raw</p>
-            <pre className="text-sm text-gray-700 font-mono whitespace-pre-wrap bg-gray-50 rounded-xl px-4 py-3">
+      <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="space-y-5">
+          <div className="app-card p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-slate-800">Message Content</h2>
+              <button
+                onClick={() => copy(template.content)}
+                className="app-button-secondary px-3 py-2 text-xs"
+              >
+                {copied ? <Check className="h-3.5 w-3.5 text-[#546dfe]" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied ? "Copied" : "Copy"}
+              </button>
+            </div>
+            <pre className="whitespace-pre-wrap rounded-lg border border-[#e6eaf4] bg-[#fafbfe] px-4 py-3 text-sm text-slate-700">
               {template.content}
             </pre>
           </div>
-          {/* Preview */}
-          <div className="px-5 py-4">
-            <p className="text-[11px] text-gray-400 uppercase tracking-wider font-medium mb-3">Preview</p>
-            <div className="bg-[#dcf8c6] rounded-xl rounded-tl-none px-4 py-3 max-w-sm text-sm text-gray-800 shadow-sm">
-              <div
-                dangerouslySetInnerHTML={{ __html: renderPreview(template.content) }}
-                className="leading-relaxed"
-              />
+
+          <div className="app-card p-5">
+            <h2 className="mb-4 text-sm font-semibold text-slate-800">Preview</h2>
+            <div className="max-w-sm rounded-lg border border-[#d8deef] bg-[#f7f9fd] px-4 py-3 text-sm text-slate-800">
+              <div dangerouslySetInnerHTML={{ __html: renderPreview(template.content) }} className="leading-relaxed" />
             </div>
           </div>
-        </div>
 
-        {/* Media */}
-        {template.mediaType && (
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100">
-              <h2 className="text-sm font-semibold text-gray-800">Lampiran Media</h2>
-            </div>
-            <div className="px-5 py-4 space-y-3">
-              <div className="flex items-center gap-3">
-                {template.mediaType === "image" && <Image    className="w-5 h-5 text-purple-500" />}
-                {template.mediaType === "file"  && <FileText className="w-5 h-5 text-orange-500" />}
-                {template.mediaType === "video" && <Video    className="w-5 h-5 text-pink-500"   />}
-                <span className="text-sm font-medium text-gray-800 capitalize">{template.mediaType}</span>
+          {template.variables.length > 0 && (
+            <div className="app-card overflow-hidden">
+              <div className="border-b border-[#e6eaf4] px-5 py-4">
+                <h2 className="text-sm font-semibold text-slate-800">Variables ({template.variables.length})</h2>
               </div>
-              {template.mediaUrl && (
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">URL</p>
-                  <code className={`text-sm font-mono break-all ${template.mediaUrl.startsWith("{") ? "text-amber-600 bg-amber-50 px-2 py-0.5 rounded" : "text-gray-700"}`}>
-                    {template.mediaUrl}
-                  </code>
-                </div>
-              )}
-              {template.mediaFilename && (
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Nama file</p>
-                  <code className={`text-sm font-mono ${template.mediaFilename.startsWith("{") ? "text-amber-600 bg-amber-50 px-2 py-0.5 rounded" : "text-gray-700"}`}>
-                    {template.mediaFilename}
-                  </code>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Variables */}
-        {template.variables.length > 0 && (
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100">
-              <h2 className="text-sm font-semibold text-gray-800">Variabel ({template.variables.length})</h2>
-            </div>
-            <div className="divide-y divide-gray-100">
-              {template.variables.map((v) => (
-                <div key={v.id} className="px-5 py-4 flex items-start gap-4">
-                  <code className="text-sm bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded font-mono flex-shrink-0 mt-0.5">
-                    {`{${v.name}}`}
-                  </code>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      {v.isRequired && (
-                        <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-medium">Wajib</span>
+              <div className="divide-y divide-[#edf1f7]">
+                {template.variables.map((v) => (
+                  <div key={v.id} className="flex items-start gap-4 px-5 py-4">
+                    <code className="mt-0.5 rounded-md bg-[#eef1ff] px-2 py-0.5 font-mono text-sm text-[#546dfe]">
+                      {`{${v.name}}`}
+                    </code>
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center gap-2">
+                        {v.isRequired && (
+                          <span className="rounded-md bg-red-50 px-1.5 py-0.5 text-[10px] font-semibold text-red-600">
+                            Required
+                          </span>
+                        )}
+                        {v.description && <span className="text-sm text-slate-700">{v.description}</span>}
+                      </div>
+                      {v.example && (
+                        <p className="text-xs text-slate-400">
+                          Example: <span className="font-mono text-slate-600">{v.example}</span>
+                        </p>
                       )}
-                      {v.description && <span className="text-sm text-gray-700">{v.description}</span>}
                     </div>
-                    {v.example && (
-                      <p className="text-xs text-gray-400">Contoh: <span className="text-gray-600 font-mono">{v.example}</span></p>
-                    )}
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+
+        <aside className="space-y-5">
+          <div className="app-card p-5">
+            <h2 className="mb-4 text-sm font-semibold text-slate-800">Meta</h2>
+            <div className="grid gap-4 text-sm md:grid-cols-2 lg:grid-cols-1">
+              {[
+                ["Template ID", template.id, true],
+                ["Created by", template.user.name, false],
+                ["Created", new Date(template.createdAt).toLocaleDateString(), false],
+                ["Updated", new Date(template.updatedAt).toLocaleDateString(), false],
+              ].map(([label, val, mono]) => (
+                <div key={label as string}>
+                  <p className="mb-1 text-xs uppercase tracking-[0.12em] text-slate-400">{label}</p>
+                  <p className={`truncate text-slate-800 ${mono ? "font-mono text-xs" : ""}`}>{val}</p>
                 </div>
               ))}
             </div>
           </div>
-        )}
 
-        {/* API Usage */}
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100">
-            <h2 className="text-sm font-semibold text-gray-800">Gunakan via API</h2>
-            <p className="text-xs text-gray-400 mt-0.5">POST /api/v1/send_template</p>
-          </div>
-          <div className="px-5 py-4">
-            <pre className="text-xs font-mono bg-gray-50 rounded-xl px-4 py-3 overflow-auto whitespace-pre text-gray-700">{
-`{
+          {template.mediaType && (
+            <div className="app-card p-5">
+              <h2 className="mb-4 text-sm font-semibold text-slate-800">Media Attachment</h2>
+              <div className="space-y-3 text-sm text-slate-700">
+                <div className="flex items-center gap-3">
+                  {template.mediaType === "image" && <Image className="h-5 w-5 text-[#546dfe]" />}
+                  {template.mediaType === "file" && <FileText className="h-5 w-5 text-[#546dfe]" />}
+                  {template.mediaType === "video" && <Video className="h-5 w-5 text-[#546dfe]" />}
+                  <span className="font-medium capitalize">{template.mediaType}</span>
+                </div>
+                {template.mediaUrl && (
+                  <div>
+                    <p className="mb-1 text-xs uppercase tracking-[0.12em] text-slate-400">URL</p>
+                    <code className="break-all font-mono text-xs text-slate-700">{template.mediaUrl}</code>
+                  </div>
+                )}
+                {template.mediaFilename && (
+                  <div>
+                    <p className="mb-1 text-xs uppercase tracking-[0.12em] text-slate-400">Filename</p>
+                    <code className="font-mono text-xs text-slate-700">{template.mediaFilename}</code>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="app-card overflow-hidden">
+            <div className="border-b border-[#e6eaf4] px-5 py-4">
+              <h2 className="text-sm font-semibold text-slate-800">Use via API</h2>
+              <p className="mt-0.5 text-xs text-slate-400">POST /api/v1/send_template</p>
+            </div>
+            <div className="px-5 py-4">
+              <pre className="overflow-auto whitespace-pre rounded-lg border border-[#e6eaf4] bg-[#fafbfe] px-4 py-3 text-xs text-slate-700">{`{
   "api_key": "YOUR-API-KEY",
   "number_key": "YOUR-NUMBER-KEY",
   "phone_no": "628123456789",
@@ -244,11 +242,10 @@ export default function TemplateDetailPage() {
   "variables": {
 ${template.variables.map((v) => `    "${v.name}": "${v.example ?? "value"}"`).join(",\n")}
   }
-}`}
-            </pre>
+}`}</pre>
+            </div>
           </div>
-        </div>
-
+        </aside>
       </div>
     </div>
   );

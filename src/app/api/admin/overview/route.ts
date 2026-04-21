@@ -8,15 +8,13 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const [totalUsers, totalNumbers] = await Promise.all([
+  const [totalUsers, numbers] = await Promise.all([
     db.user.count(),
-    db.waNumber.count(),
+    db.waNumber.findMany({
+      include: { user: { select: { name: true, email: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
-
-  const numbers = await db.waNumber.findMany({
-    include: { user: { select: { name: true, email: true } } },
-    orderBy: { createdAt: "desc" },
-  });
 
   // Enrich numbers with live status
   const { getWaClient } = await import("@/lib/wa-client");
@@ -32,7 +30,7 @@ export async function GET() {
   return NextResponse.json({
     stats: {
       totalUsers,
-      totalNumbers,
+      totalNumbers: numbers.length,
       connectedNumbers: connectedCount,
     },
     numbers: enrichedNumbers,
