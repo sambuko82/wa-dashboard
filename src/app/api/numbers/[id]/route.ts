@@ -34,6 +34,32 @@ export async function GET(
   return NextResponse.json({ ...number, status: client?.status ?? "disconnected" });
 }
 
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+  const number = await getAuthorizedNumber(id, session.userId, session.role);
+  if (!number) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  const { label, phoneNumber, description } = await req.json();
+
+  const updated = await db.waNumber.update({
+    where: { id },
+    data: {
+      ...(label?.trim() ? { label: label.trim() } : {}),
+      ...(phoneNumber !== undefined ? { phoneNumber: phoneNumber || null } : {}),
+      ...(description !== undefined ? { description: description || null } : {}),
+    },
+    select: { id: true, label: true, phoneNumber: true, description: true },
+  });
+
+  return NextResponse.json(updated);
+}
+
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

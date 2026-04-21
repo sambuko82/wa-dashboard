@@ -8,12 +8,26 @@ import {
   Send, Webhook, Key, Copy, Check, Loader2,
   MessageSquare, Image as ImageIcon, Video, FileText, Users,
   Play, Music, Archive, File,
+  Bell, BookOpen, Pencil, Plus, Save, Trash2, X,
 } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
 import { cn } from "@/lib/utils";
 import type { ConnectionStatus } from "@/lib/wa-client";
 
-type Tab = "connection" | "send" | "groups" | "webhook" | "api";
+type Tab = "connection" | "send" | "groups" | "webhook" | "api" | "profile";
+
+interface WaNumberNote {
+  id: string;
+  content: string;
+  createdAt: string;
+}
+
+interface WaNumberReminder {
+  id: string;
+  description: string;
+  dueDate: string;
+  isCompleted: boolean;
+}
 
 interface NumberInfo {
   id: string;
@@ -26,6 +40,7 @@ interface NumberInfo {
   user?: { id: string; name: string; email: string };
   qr?: string | null;
   stats?: { sent: number; received: number };
+  description?: string | null;
 }
 
 interface Message {
@@ -926,6 +941,304 @@ curl_close($curl);`}</pre>
   );
 }
 
+// ─── Profile Tab ─────────────────────────────────────────────────────────────
+function ProfileTab({
+  numberId,
+  info,
+  onSaved,
+}: {
+  numberId: string;
+  info: NumberInfo;
+  onSaved: () => void;
+}) {
+  // Edit fields
+  const [label, setLabel] = useState(info.label);
+  const [phoneNumber, setPhoneNumber] = useState(info.phoneNumber ?? "");
+  const [description, setDescription] = useState(info.description ?? "");
+  const [saving, setSaving] = useState(false);
+  const [savedOk, setSavedOk] = useState(false);
+
+  // Notes
+  const [notes, setNotes] = useState<WaNumberNote[]>([]);
+  const [newNote, setNewNote] = useState("");
+  const [addingNote, setAddingNote] = useState(false);
+
+  // Reminders
+  const [reminders, setReminders] = useState<WaNumberReminder[]>([]);
+  const [reminderDesc, setReminderDesc] = useState("");
+  const [reminderDate, setReminderDate] = useState("");
+  const [addingReminder, setAddingReminder] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      fetch(`/api/numbers/${numberId}/notes`).then(r => r.json()),
+      fetch(`/api/numbers/${numberId}/reminders`).then(r => r.json()),
+    ]).then(([n, r]) => {
+      if (Array.isArray(n)) setNotes(n);
+      if (Array.isArray(r)) setReminders(r);
+    }).catch(() => {});
+  }, [numberId]);
+
+  const saveProfile = async () => {
+    setSaving(true);
+    try {
+      await fetch(`/api/numbers/${numberId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label, phoneNumber, description }),
+      });
+      setSavedOk(true);
+      setTimeout(() => setSavedOk(false), 2000);
+      onSaved();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const addNote = async () => {
+    if (!newNote.trim()) return;
+    setAddingNote(true);
+    try {
+      const res = await fetch(`/api/numbers/${numberId}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: newNote.trim() }),
+      });
+      const note = await res.json();
+      setNotes(prev => [note, ...prev]);
+      setNewNote("");
+    } finally {
+      setAddingNote(false);
+    }
+  };
+
+  const deleteNote = async (noteId: string) => {
+    setNotes(prev => prev.filter(n => n.id !== noteId));
+    await fetch(`/api/numbers/${numberId}/notes?noteId=${noteId}`, { method: "DELETE" });
+  };
+
+  const addReminder = async () => {
+    if (!reminderDesc.trim() || !reminderDate) return;
+    setAddingReminder(true);
+    try {
+      const res = await fetch(`/api/numbers/${numberId}/reminders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: reminderDesc.trim(), dueDate: reminderDate }),
+      });
+      const reminder = await res.json();
+      setReminders(prev => [...prev, reminder].sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()));
+      setReminderDesc("");
+      setReminderDate("");
+    } finally {
+      setAddingReminder(false);
+    }
+  };
+
+  const toggleReminder = async (reminderId: string, isCompleted: boolean) => {
+    setReminders(prev => prev.map(r => r.id === reminderId ? { ...r, isCompleted } : r));
+    await fetch(`/api/numbers/${numberId}/reminders`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reminderId, isCompleted }),
+    });
+  };
+
+  const deleteReminder = async (reminderId: string) => {
+    setReminders(prev => prev.filter(r => r.id !== reminderId));
+    await fetch(`/api/numbers/${numberId}/reminders?reminderId=${reminderId}`, { method: "DELETE" });
+  };
+
+  const inputCls = "app-input";
+  const pending = reminders.filter(r => !r.isCompleted);
+  const completed = reminders.filter(r => r.isCompleted);
+
+  return (
+    <div className="grid gap-5 lg:grid-cols-2">
+      {/* ── Edit Info ── */}
+      <div className="space-y-5">
+        <div className="app-card p-5">
+          <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-800">
+            <Pencil className="w-4 h-4 text-[#546dfe]" />
+            Edit Info Nomor
+          </h2>
+          <div className="space-y-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-slate-500">Nama / Label</label>
+              <input value={label} onChange={e => setLabel(e.target.value)} className={inputCls} placeholder="Nama nomor..." />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-slate-500">Nomor HP</label>
+              <input value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} className={inputCls} placeholder="628xxx (opsional, biasanya otomatis dari WA)" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-slate-500">Context / Deskripsi</label>
+              <textarea
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                rows={4}
+                className={inputCls + " resize-none"}
+                placeholder="Kegunaan nomor ini, target audience, catatan penting..."
+              />
+            </div>
+            <button
+              onClick={saveProfile}
+              disabled={saving}
+              className="app-button-primary w-full"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : savedOk ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+              {saving ? "Menyimpan..." : savedOk ? "Tersimpan!" : "Simpan Perubahan"}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Reminders ── */}
+        <div className="app-card p-5">
+          <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-800">
+            <Bell className="w-4 h-4 text-[#546dfe]" />
+            Reminders
+            {pending.length > 0 && (
+              <span className="ml-auto rounded-full bg-[#eef1ff] px-2 py-0.5 text-xs font-bold text-[#546dfe]">
+                {pending.length}
+              </span>
+            )}
+          </h2>
+
+          {/* Add reminder */}
+          <div className="mb-4 space-y-2 rounded-xl border border-[#e5ebf5] bg-[#f8fafc] p-3">
+            <input
+              value={reminderDesc}
+              onChange={e => setReminderDesc(e.target.value)}
+              placeholder="Deskripsi reminder..."
+              className={inputCls}
+            />
+            <div className="flex gap-2">
+              <input
+                type="datetime-local"
+                value={reminderDate}
+                onChange={e => setReminderDate(e.target.value)}
+                className={inputCls + " flex-1"}
+              />
+              <button
+                onClick={addReminder}
+                disabled={addingReminder || !reminderDesc.trim() || !reminderDate}
+                className="app-button-primary disabled:opacity-50"
+              >
+                {addingReminder ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {pending.map(r => (
+              <div key={r.id} className="flex items-start gap-3 rounded-lg border border-[#e5ebf5] bg-white px-3 py-2.5">
+                <input
+                  type="checkbox"
+                  checked={r.isCompleted}
+                  onChange={e => toggleReminder(r.id, e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded accent-[#546dfe]"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-slate-800">{r.description}</p>
+                  <p className="mt-0.5 text-xs text-slate-400">
+                    {new Date(r.dueDate).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}
+                  </p>
+                </div>
+                <button onClick={() => deleteReminder(r.id)} className="text-slate-300 hover:text-red-400 transition-colors">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+            {pending.length === 0 && (
+              <p className="py-3 text-center text-xs text-slate-400">Tidak ada reminder aktif</p>
+            )}
+            {completed.length > 0 && (
+              <details className="pt-1">
+                <summary className="cursor-pointer text-xs text-slate-400 hover:text-slate-600">
+                  {completed.length} selesai
+                </summary>
+                <div className="mt-2 space-y-1.5">
+                  {completed.map(r => (
+                    <div key={r.id} className="flex items-start gap-3 rounded-lg px-3 py-2 opacity-50">
+                      <input
+                        type="checkbox"
+                        checked
+                        onChange={e => toggleReminder(r.id, e.target.checked)}
+                        className="mt-0.5 h-4 w-4 rounded accent-[#546dfe]"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm line-through text-slate-500">{r.description}</p>
+                        <p className="text-xs text-slate-400">
+                          {new Date(r.dueDate).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}
+                        </p>
+                      </div>
+                      <button onClick={() => deleteReminder(r.id)} className="text-slate-300 hover:text-red-400 transition-colors">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Interaction Notes ── */}
+      <div className="app-card p-5">
+        <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-800">
+          <BookOpen className="w-4 h-4 text-[#546dfe]" />
+          Interaction Notes
+        </h2>
+
+        <div className="mb-4">
+          <textarea
+            value={newNote}
+            onChange={e => setNewNote(e.target.value)}
+            rows={3}
+            placeholder="Catat interaksi, kejadian penting, atau hal yang perlu diingat..."
+            className={inputCls + " resize-none"}
+            onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) addNote(); }}
+          />
+          <button
+            onClick={addNote}
+            disabled={addingNote || !newNote.trim()}
+            className="mt-2 app-button-primary w-full disabled:opacity-50"
+          >
+            {addingNote ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+            Tambah Catatan
+          </button>
+        </div>
+
+        <div className="space-y-3 max-h-[500px] overflow-y-auto">
+          {notes.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-10 text-slate-400">
+              <BookOpen className="mb-2 w-8 h-8 opacity-30" />
+              <p className="text-sm">Belum ada catatan</p>
+            </div>
+          )}
+          {notes.map(note => (
+            <div key={note.id} className="group rounded-xl border border-[#e5ebf5] bg-[#f8fafc] p-3">
+              <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{note.content}</p>
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-xs text-slate-400">
+                  {new Date(note.createdAt).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}
+                </p>
+                <button
+                  onClick={() => deleteNote(note.id)}
+                  className="text-slate-300 opacity-0 group-hover:opacity-100 transition-all hover:text-red-400"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function NumberDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -1012,6 +1325,7 @@ export default function NumberDetailPage() {
     { id: "groups", icon: Users, label: "Groups" },
     { id: "webhook", icon: Webhook, label: "Webhook" },
     { id: "api", icon: Key, label: "API" },
+    { id: "profile", icon: BookOpen, label: "Profile" },
   ];
 
   return (
@@ -1096,6 +1410,9 @@ export default function NumberDetailPage() {
       )}
       {activeTab === "api" && (
         <ApiTab numberId={id} apiKey={info.apiKey} userApiKey={info.userApiKey ?? null} />
+      )}
+      {activeTab === "profile" && (
+        <ProfileTab numberId={id} info={info} onSaved={fetchInfo} />
       )}
     </div>
   );

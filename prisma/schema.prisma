@@ -32,20 +32,48 @@ model User {
 }
 
 model WaNumber {
-  id                 String          @id @default(cuid())
+  id                 String             @id @default(cuid())
   userId             String
-  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   label              String
-  apiKey             String          @unique
+  apiKey             String             @unique
   webhookUrl         String?
   phoneNumber        String?
+  description        String?            @db.Text
   authDir            String
-  authState          Json? // Baileys session backup for cross-Lambda restore (Vercel)
-  connectionActiveAt DateTime? // Heartbeat: updated every 30 s while connected
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
+  authState          Json?
+  connectionActiveAt DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
   messages           MessageLog[]
   contacts           Contact[]
+  notes              WaNumberNote[]
+  reminders          WaNumberReminder[]
+}
+
+model WaNumberNote {
+  id         String   @id @default(cuid())
+  waNumberId String
+  waNumber   WaNumber @relation(fields: [waNumberId], references: [id], onDelete: Cascade)
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([waNumberId])
+}
+
+model WaNumberReminder {
+  id          String   @id @default(cuid())
+  waNumberId  String
+  waNumber    WaNumber @relation(fields: [waNumberId], references: [id], onDelete: Cascade)
+  description String   @db.Text
+  dueDate     DateTime
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([waNumberId])
+  @@index([dueDate])
 }
 
 model MessageLog {
