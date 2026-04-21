@@ -5,11 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
   BookOpen,
-  BriefcaseBusiness,
   CalendarDays,
-  ChevronDown,
   FileText,
-  Folder,
   House,
   LogOut,
   MessageSquare,
@@ -103,23 +100,6 @@ export function Sidebar() {
             </Link>
           </div>
 
-          <div className="border-b border-white/10 px-4 py-4">
-            <div className="app-sidebar-card px-3 py-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#6d3cc4] text-sm font-bold">
-                  CT
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">CRM Teamspace</p>
-                  <p className="truncate text-xs text-slate-300">
-                    {user?.role === "ADMIN" ? "Admin workspace" : "Sales workspace"}
-                  </p>
-                </div>
-                <ChevronDown className="h-4 w-4 text-slate-300" />
-              </div>
-            </div>
-          </div>
-
           <nav className="flex-1 px-3 py-4">
             {navGroups.map((group) => (
               <div key={group.title} className="mb-5">
@@ -200,18 +180,6 @@ export function Sidebar() {
         </div>
       </header>
 
-      <div className="border-b border-[#d8deef] bg-white lg:ml-[272px]">
-        <div className="flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-slate-500 sm:px-6 lg:px-8">
-          <span className="inline-flex items-center gap-2 rounded-md bg-[#eef2fa] px-2.5 py-1 text-slate-600">
-            <BriefcaseBusiness className="h-3.5 w-3.5" />
-            CRM Teamspace
-          </span>
-          <span className="hidden md:inline-flex items-center gap-2 rounded-md bg-[#f6f8fc] px-2.5 py-1 text-slate-500">
-            <Folder className="h-3.5 w-3.5" />
-            Enterprise view
-          </span>
-        </div>
-      </div>
     </>
   );
 }
