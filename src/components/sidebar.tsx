@@ -13,6 +13,7 @@ import {
   Phone,
   ShieldCheck,
   Users,
+  Plane,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/providers";
@@ -73,13 +74,21 @@ export function Sidebar() {
 
   const CRM_HREFS = ["/contacts", "/crm", "/reminders"];
 
-  const filterJvto = (groups: NavGroup[]) =>
-    groups
+  const filterJvto = (groups: NavGroup[]): NavGroup[] => {
+    const filtered = groups
       .map((g) => ({
         ...g,
         items: g.items.filter((item) => !CRM_HREFS.some((h) => item.href.startsWith(h))),
       }))
       .filter((g) => g.items.length > 0);
+
+    // Insert Customers nav item into Workspace group
+    return filtered.map((g) =>
+      g.title === "Workspace"
+        ? { ...g, items: [{ href: "/customers", label: "Customers", icon: Plane }, ...g.items] }
+        : g,
+    );
+  };
 
   const baseGroups = user?.role === "ADMIN" ? adminNavGroups : userNavGroups;
   const navGroups = user?.isJvto ? filterJvto(baseGroups) : baseGroups;

@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getOrCreateWaClient, waitForConnected } from "@/lib/wa-client";
 import { parseTemplate, validateVariables } from "@/lib/template-utils";
+import { isJvtoPhone, normalizePhone } from "@/lib/jvto-utils";
 
 export async function POST(
   req: NextRequest,
@@ -82,17 +83,19 @@ export async function POST(
       return NextResponse.json({ error: "Nothing to send (empty content and no media)" }, { status: 400 });
     }
 
-    // Log the message
-    await db.messageLog.create({
-      data: {
-        numberId: id,
-        direction: "OUT",
-        toFrom: to,
-        content: caption || mediaUrl || "",
-        mediaType: template.mediaType ?? null,
-        templateId: templateId,
-      },
-    });
+    // Log the message — only for JVTO customers (non-Indonesian, non-group)
+    if (isJvtoPhone(to)) {
+      await db.messageLog.create({
+        data: {
+          numberId: id,
+          direction: "OUT",
+          toFrom: normalizePhone(to),
+          content: caption || mediaUrl || "",
+          mediaType: template.mediaType ?? null,
+          templateId: templateId,
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,

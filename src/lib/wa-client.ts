@@ -6,6 +6,7 @@ import {
   makeCacheableSignalKeyStore,
   isJidBroadcast,
 } from "@whiskeysockets/baileys";
+import { isJvtoPhone, normalizePhone } from "./jvto-utils";
 import { Boom } from "@hapi/boom";
 import QRCode from "qrcode";
 import path from "path";
@@ -375,6 +376,25 @@ export class WhatsAppClient {
 
           if (this.webhookUrl) {
             this._sendWebhook(payload).catch(() => {});
+          }
+
+          // Save to MessageLog only for JVTO customers (non-Indonesian, non-group)
+          const remoteJid = msg.key.remoteJid ?? "";
+          if (isJvtoPhone(remoteJid) && this.numberId !== "legacy") {
+            const phone = normalizePhone(remoteJid);
+            const textContent = (payload.text as string | null) ?? null;
+            const mediaKind = (payload.media ? msgType : null);
+            import("./db").then(({ db }) =>
+              db.messageLog.create({
+                data: {
+                  numberId: this.numberId,
+                  direction: msg.key.fromMe ? "OUT" : "IN",
+                  toFrom: phone,
+                  content: textContent,
+                  mediaType: mediaKind,
+                },
+              })
+            ).catch(() => {});
           }
         }
       }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getClientByKeys, waitForConnected } from "@/lib/wa-client";
 import { corsOptions, withCors } from "@/lib/cors";
+import { db } from "@/lib/db";
+import { isJvtoPhone, normalizePhone } from "@/lib/jvto-utils";
 
 export function OPTIONS() { return corsOptions(); }
 
@@ -32,6 +34,20 @@ export async function POST(req: NextRequest) {
       if (!ok) return withCors(NextResponse.json({ status: "1004", message: "WhatsApp is not connected" }, { status: 400 }));
     }
     await client.sendText(phone_no, message);
+
+    // Save to MessageLog only for JVTO customers (non-Indonesian, non-group)
+    if (isJvtoPhone(phone_no)) {
+      db.messageLog.create({
+        data: {
+          numberId: found.number.id,
+          direction: "OUT",
+          toFrom: normalizePhone(phone_no),
+          content: message,
+          mediaType: null,
+        },
+      }).catch(() => {});
+    }
+
     return withCors(NextResponse.json({
       status: "200",
       message: "Message sent successfully",

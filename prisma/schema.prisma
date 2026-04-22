@@ -121,15 +121,16 @@ model Contact {
 }
 
 model PipelineStage {
-  id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  order     Int       @default(0)
-  color     String    @default("#25d366")
-  contacts  Contact[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  order           Int              @default(0)
+  color           String           @default("#25d366")
+  contacts        Contact[]
+  jvtoCrmContacts JvtoCrmContact[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@index([userId])
 }
@@ -149,14 +150,15 @@ model Reminder {
 }
 
 model Label {
-  id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  color     String    @default("#25d366")
-  contacts  Contact[] @relation("ContactLabels")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  color           String           @default("#25d366")
+  contacts        Contact[]        @relation("ContactLabels")
+  jvtoCrmContacts JvtoCrmContact[] @relation("JvtoCrmContactLabels")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@index([userId])
 }
@@ -170,6 +172,46 @@ model ContactNote {
   updatedAt DateTime @updatedAt
 
   @@index([contactId])
+}
+
+model JvtoCrmContact {
+  id             String             @id @default(cuid())
+  jvtoCustomerId String             @unique
+  pipelineStageId String?
+  pipelineStage   PipelineStage?    @relation(fields: [pipelineStageId], references: [id], onDelete: SetNull)
+  labels          Label[]           @relation("JvtoCrmContactLabels")
+  notes           String?           @db.Text
+  adminNotes      JvtoCrmNote[]
+  reminders       JvtoCrmReminder[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([pipelineStageId])
+}
+
+model JvtoCrmNote {
+  id             String         @id @default(cuid())
+  crmContactId   String
+  crmContact     JvtoCrmContact @relation(fields: [crmContactId], references: [id], onDelete: Cascade)
+  content        String         @db.Text
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([crmContactId])
+}
+
+model JvtoCrmReminder {
+  id             String         @id @default(cuid())
+  crmContactId   String
+  crmContact     JvtoCrmContact @relation(fields: [crmContactId], references: [id], onDelete: Cascade)
+  description    String         @db.Text
+  dueDate        DateTime
+  isCompleted    Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([crmContactId])
+  @@index([dueDate])
 }
 
 model Template {
