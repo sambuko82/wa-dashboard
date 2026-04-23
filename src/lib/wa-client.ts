@@ -384,15 +384,24 @@ export class WhatsAppClient {
           // Resolve @lid to real phone via Baileys participant/message data
           let resolvedPhone: string | null = null;
           if (remoteJid.includes("@lid")) {
-            // Try to get phone from message participant or verifiedBizName
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const fullMsg = msg as any;
             const participant = fullMsg.participant ?? fullMsg.key?.participant ?? null;
             if (participant && !participant.includes("@lid")) {
               resolvedPhone = normalizePhone(participant);
             } else {
-              // Log full message for debugging
-              console.log("[MSG @lid]", JSON.stringify({ remoteJid, participant, key: msg.key }));
+              // Save debug info to DB so we can inspect structure without server logs
+              import("./db").then(({ db }) =>
+                db.messageLog.create({
+                  data: {
+                    numberId: this.numberId === "legacy" ? "debug" : this.numberId,
+                    direction: "IN",
+                    toFrom: "DEBUG_LID",
+                    content: JSON.stringify({ remoteJid, participant, keyParticipant: msg.key }),
+                    mediaType: "debug",
+                  },
+                })
+              ).catch(() => {});
             }
           } else if (isJvtoPhone(remoteJid)) {
             resolvedPhone = normalizePhone(remoteJid);
