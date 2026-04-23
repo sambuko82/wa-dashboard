@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getOrCreateWaClient, waitForConnected } from "@/lib/wa-client";
+import { isJvtoPhone, normalizePhone } from "@/lib/jvto-utils";
 
 export async function POST(
   req: NextRequest,
@@ -32,6 +33,19 @@ export async function POST(
       if (!ok) return NextResponse.json({ error: "WhatsApp is not connected" }, { status: 400 });
     }
     const result = await client.sendText(to, text);
+
+    if (isJvtoPhone(to)) {
+      await db.messageLog.create({
+        data: {
+          numberId: id,
+          direction: "OUT",
+          toFrom: normalizePhone(to),
+          content: text,
+          mediaType: null,
+        },
+      });
+    }
+
     return NextResponse.json(result);
   } catch (err) {
     return NextResponse.json(
