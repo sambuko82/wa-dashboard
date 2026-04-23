@@ -381,27 +381,16 @@ export class WhatsAppClient {
           // Save to MessageLog only for JVTO customers (non-Indonesian, non-group)
           const remoteJid = msg.key.remoteJid ?? "";
 
-          // Resolve @lid to real phone via Baileys participant/message data
+          // Resolve @lid to real phone via Baileys key.remoteJidAlt
           let resolvedPhone: string | null = null;
           if (remoteJid.includes("@lid")) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const fullMsg = msg as any;
-            const participant = fullMsg.participant ?? fullMsg.key?.participant ?? null;
-            if (participant && !participant.includes("@lid")) {
-              resolvedPhone = normalizePhone(participant);
-            } else {
-              // Save debug info to DB so we can inspect structure without server logs
-              import("./db").then(({ db }) =>
-                db.messageLog.create({
-                  data: {
-                    numberId: this.numberId === "legacy" ? "debug" : this.numberId,
-                    direction: "IN",
-                    toFrom: "DEBUG_LID",
-                    content: JSON.stringify({ remoteJid, participant, keyParticipant: msg.key }),
-                    mediaType: "debug",
-                  },
-                })
-              ).catch(() => {});
+            const remoteJidAlt = (msg.key as any).remoteJidAlt ?? null;
+            if (remoteJidAlt && !remoteJidAlt.includes("@lid")) {
+              const altPhone = normalizePhone(remoteJidAlt);
+              if (isJvtoPhone(altPhone)) {
+                resolvedPhone = altPhone;
+              }
             }
           } else if (isJvtoPhone(remoteJid)) {
             resolvedPhone = normalizePhone(remoteJid);
