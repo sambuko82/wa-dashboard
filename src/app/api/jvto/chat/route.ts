@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
         toFrom: true,
         content: true,
         mediaType: true,
+        mediaData: true,
         createdAt: true,
         number: { select: { id: true, label: true, phoneNumber: true } },
       },

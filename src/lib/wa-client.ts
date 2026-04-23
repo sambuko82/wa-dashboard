@@ -5,6 +5,8 @@ import {
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore,
   isJidBroadcast,
+  downloadMediaMessage,
+  extensionForMediaMessage,
 } from "@whiskeysockets/baileys";
 import { isJvtoPhone, normalizePhone } from "./jvto-utils";
 import { Boom } from "@hapi/boom";
@@ -15,6 +17,46 @@ import pino from "pino";
 
 declare global {
   var __waClients: Map<string, WhatsAppClient> | undefined;
+}
+
+/** Directory for storing decrypted media files. */
+function getMediaDir(): string {
+  if (process.env.VERCEL) return "/tmp/wa-media";
+  return path.join(process.cwd(), "public", "wa-media");
+}
+
+/**
+ * Download and decrypt a WhatsApp media message, save to disk.
+ * Returns the saved file path (relative to getMediaDir()), or null on failure.
+ */
+async function downloadAndSaveMedia(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fullMsg: any,
+  messageId: string
+): Promise<string | null> {
+  try {
+    const msgContent = fullMsg.message as Record<string, unknown>;
+    const msgType = Object.keys(msgContent)[0];
+    const mediaTypes = ["imageMessage", "videoMessage", "audioMessage", "documentMessage", "stickerMessage"];
+    if (!mediaTypes.includes(msgType)) return null;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const msgInner = msgContent[msgType] as Record<string, any>;
+    const mimetype: string = msgInner?.mimetype ?? "application/octet-stream";
+    const ext = mimetype.split(";")[0]?.split("/")[1] ?? extensionForMediaMessage(msgContent as Parameters<typeof extensionForMediaMessage>[0]);
+    if (!ext) return null;
+
+    const buffer = await downloadMediaMessage(fullMsg, "buffer", {});
+    if (!buffer || !(buffer instanceof Buffer)) return null;
+
+    const mediaDir = getMediaDir();
+    fs.mkdirSync(mediaDir, { recursive: true });
+    const filename = `${messageId}.${ext}`;
+    fs.writeFileSync(path.join(mediaDir, filename), buffer);
+    return filename;
+  } catch {
+    return null;
+  }
 }
 
 /** On Vercel the deployment package is read-only; /tmp is the only writable dir. */
@@ -407,8 +449,11 @@ export class WhatsAppClient {
               ? msgType
               : null;
 
-            import("./db").then(({ db }) =>
-              db.messageLog.create({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const fullMsg = msg as any;
+
+            import("./db").then(async ({ db }) => {
+              const log = await db.messageLog.create({
                 data: {
                   numberId: this.numberId,
                   direction: msg.key.fromMe ? "OUT" : "IN",
@@ -417,8 +462,20 @@ export class WhatsAppClient {
                   mediaType: mediaKind,
                   mediaData: mediaData ? (mediaData as import("@prisma/client").Prisma.InputJsonValue) : undefined,
                 },
-              })
-            ).catch(() => {});
+              });
+
+              // Download and decrypt media immediately so it can be previewed
+              if (mediaKind && payload.media) {
+                const filename = await downloadAndSaveMedia(fullMsg, log.id);
+                if (filename) {
+                  const updatedMedia = { ...(mediaData ?? {}), localFile: filename };
+                  await db.messageLog.update({
+                    where: { id: log.id },
+                    data: { mediaData: updatedMedia as import("@prisma/client").Prisma.InputJsonValue },
+                  });
+                }
+              }
+            }).catch(() => {});
           }
         }
       }

@@ -8,9 +8,11 @@ import {
   Calendar,
   CheckCircle2,
   ExternalLink,
+  FileText,
   Loader2,
   MapPin,
   MessageSquare,
+  Music,
   Package,
   Phone,
   Plus,
@@ -20,6 +22,7 @@ import {
   Tag,
   Trash2,
   User,
+  Video,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -56,6 +59,7 @@ interface ChatMessage {
   direction: "IN" | "OUT";
   content: string | null;
   mediaType: string | null;
+  mediaData: Record<string, unknown> | null;
   createdAt: string;
   number: { id: string; label: string; phoneNumber: string | null };
 }
@@ -100,6 +104,106 @@ function fmt(date: string) {
     day: "numeric",
     year: "numeric",
   });
+}
+
+// ── Media Preview ─────────────────────────────────────────────────────────
+
+function MediaPreview({ msg, isOut }: { msg: ChatMessage; isOut: boolean }) {
+  const { mediaType, mediaData, id } = msg;
+  if (!mediaType) return null;
+
+  const localFile = mediaData?.localFile as string | undefined;
+  const mimetype = mediaData?.mimetype as string | undefined;
+  const mediaUrl = localFile ? `/api/media/${id}` : null;
+
+  const dimClass = "rounded-lg overflow-hidden max-w-[220px]";
+  const placeholderClass = cn(
+    "flex items-center gap-2 rounded-lg border px-3 py-2 text-xs",
+    isOut ? "border-white/30 text-white/80" : "border-slate-200 text-slate-500"
+  );
+
+  if (mediaType === "imageMessage" || mediaType === "stickerMessage") {
+    if (mediaUrl) {
+      return (
+        <a href={mediaUrl} target="_blank" rel="noopener noreferrer" className={dimClass}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={mediaUrl} alt="image" className="max-h-48 w-full object-cover" />
+        </a>
+      );
+    }
+    return <span className={placeholderClass}>[Image — not available]</span>;
+  }
+
+  if (mediaType === "videoMessage") {
+    if (mediaUrl) {
+      return (
+        <div className={dimClass}>
+          <video src={mediaUrl} controls className="max-h-48 w-full" />
+        </div>
+      );
+    }
+    return (
+      <span className={placeholderClass}>
+        <Video className="h-3.5 w-3.5 shrink-0" /> Video — not available
+      </span>
+    );
+  }
+
+  if (mediaType === "audioMessage") {
+    if (mediaUrl) {
+      return <audio src={mediaUrl} controls className="max-w-[220px]" />;
+    }
+    return (
+      <span className={placeholderClass}>
+        <Music className="h-3.5 w-3.5 shrink-0" /> Audio — not available
+      </span>
+    );
+  }
+
+  if (mediaType === "documentMessage") {
+    const filename = (mediaData?.filename as string) ?? (mimetype ?? "document");
+    if (mediaUrl) {
+      return (
+        <a href={mediaUrl} target="_blank" rel="noopener noreferrer" className={placeholderClass + " hover:opacity-80"}>
+          <FileText className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate max-w-[160px]">{filename}</span>
+          <ExternalLink className="h-3 w-3 shrink-0 opacity-60" />
+        </a>
+      );
+    }
+    return (
+      <span className={placeholderClass}>
+        <FileText className="h-3.5 w-3.5 shrink-0" /> {filename}
+      </span>
+    );
+  }
+
+  if (mediaType === "locationMessage" || mediaType === "liveLocationMessage") {
+    const lat = mediaData?.latitude;
+    const lng = mediaData?.longitude;
+    const name = mediaData?.name as string | undefined;
+    if (lat && lng) {
+      return (
+        <a
+          href={`https://maps.google.com/?q=${lat},${lng}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={placeholderClass + " hover:opacity-80"}
+        >
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
+          {name ?? `${lat}, ${lng}`}
+        </a>
+      );
+    }
+    return <span className={placeholderClass}><MapPin className="h-3.5 w-3.5 shrink-0" /> Location</span>;
+  }
+
+  if (mediaType === "contactMessage" || mediaType === "contactsArrayMessage") {
+    const displayName = mediaData?.displayName as string | undefined;
+    return <span className={placeholderClass}><User className="h-3.5 w-3.5 shrink-0" /> Contact{displayName ? `: ${displayName}` : ""}</span>;
+  }
+
+  return <span className={placeholderClass}>[{mediaType}]</span>;
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
@@ -447,10 +551,8 @@ export default function CustomerDetailClient() {
                   return (
                     <div key={msg.id} className={cn("flex", isOut ? "justify-end" : "justify-start")}>
                       <div className={cn("max-w-[75%] rounded-2xl px-4 py-2.5 text-sm", isOut ? "rounded-br-sm bg-[#546dfe] text-white" : "rounded-bl-sm bg-[#f0f2f8] text-slate-800")}>
-                        {msg.mediaType && !msg.content && (
-                          <p className="italic text-xs opacity-70">[{msg.mediaType}]</p>
-                        )}
-                        {msg.content && <p className="leading-[1.55]">{msg.content}</p>}
+                        {msg.mediaType && <MediaPreview msg={msg} isOut={isOut} />}
+                        {msg.content && <p className="mt-1 leading-[1.55]">{msg.content}</p>}
                         <p className={cn("mt-1 text-right text-[11px]", isOut ? "text-white/60" : "text-slate-400")}>
                           <FormattedTime date={msg.createdAt} />
                           {" · "}
