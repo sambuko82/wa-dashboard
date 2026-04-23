@@ -32,7 +32,7 @@ export function isJvtoPhone(phoneOrJid: string): boolean {
   return true;
 }
 
-/** Normalize JID / phone to a plain phone number string (no + no @). */
+/** Normalize JID / phone to a plain phone number string (digits only, no + no @). */
 export function normalizePhone(phoneOrJid: string): string {
-  return phoneOrJid.split("@")[0].replace(/^\+/, "");
+  return phoneOrJid.split("@")[0].replace(/^\+/, "").trim();
 }

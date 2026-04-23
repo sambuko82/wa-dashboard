@@ -277,8 +277,8 @@ export default function CustomerDetailClient() {
   const fetchMessages = async () => {
     if (!customer) return;
     try {
-      const phone = customer.phone.replace(/^\+/, "");
-      const res = await fetch(`/api/jvto/chat?phone=${phone}`);
+      const phone = customer.phone.replace(/\D/g, "");
+      const res = await fetch(`/api/jvto/chat?phone=${encodeURIComponent(phone)}`);
       if (res.ok) {
         const data = await res.json();
         setMessages(data.messages ?? []);
