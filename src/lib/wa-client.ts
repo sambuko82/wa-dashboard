@@ -380,8 +380,25 @@ export class WhatsAppClient {
 
           // Save to MessageLog only for JVTO customers (non-Indonesian, non-group)
           const remoteJid = msg.key.remoteJid ?? "";
-          if (isJvtoPhone(remoteJid) && this.numberId !== "legacy") {
-            const phone = normalizePhone(remoteJid);
+
+          // Resolve @lid to real phone via Baileys participant/message data
+          let resolvedPhone: string | null = null;
+          if (remoteJid.includes("@lid")) {
+            // Try to get phone from message participant or verifiedBizName
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const fullMsg = msg as any;
+            const participant = fullMsg.participant ?? fullMsg.key?.participant ?? null;
+            if (participant && !participant.includes("@lid")) {
+              resolvedPhone = normalizePhone(participant);
+            } else {
+              // Log full message for debugging
+              console.log("[MSG @lid]", JSON.stringify({ remoteJid, participant, key: msg.key }));
+            }
+          } else if (isJvtoPhone(remoteJid)) {
+            resolvedPhone = normalizePhone(remoteJid);
+          }
+
+          if (resolvedPhone && this.numberId !== "legacy") {
             const textContent = (payload.text as string | null) ?? null;
             const mediaKind = (payload.media ? msgType : null);
             import("./db").then(({ db }) =>
@@ -389,7 +406,7 @@ export class WhatsAppClient {
                 data: {
                   numberId: this.numberId,
                   direction: msg.key.fromMe ? "OUT" : "IN",
-                  toFrom: phone,
+                  toFrom: resolvedPhone!,
                   content: textContent,
                   mediaType: mediaKind,
                 },
