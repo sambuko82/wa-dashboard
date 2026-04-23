@@ -85,6 +85,7 @@ model MessageLog {
   toFrom     String
   content    String?
   mediaType  String?
+  mediaData  Json?     // url, mimetype, filename, fileSize, seconds, etc.
   templateId String?
   template   Template? @relation(fields: [templateId], references: [id], onDelete: SetNull)
   contactId  String?
@@ -94,6 +95,7 @@ model MessageLog {
   @@index([numberId])
   @@index([contactId])
   @@index([createdAt])
+  @@index([toFrom])
 }
 
 model Contact {

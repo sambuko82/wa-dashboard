@@ -398,7 +398,15 @@ export class WhatsAppClient {
 
           if (resolvedPhone && this.numberId !== "legacy") {
             const textContent = (payload.text as string | null) ?? null;
-            const mediaKind = (payload.media ? msgType : null);
+            const mediaData = (payload.media ?? payload.location ?? payload.contact) as Record<string, unknown> | null ?? null;
+            const mediaKind = payload.media
+              ? msgType
+              : payload.location
+              ? msgType
+              : payload.contact
+              ? msgType
+              : null;
+
             import("./db").then(({ db }) =>
               db.messageLog.create({
                 data: {
@@ -407,6 +415,7 @@ export class WhatsAppClient {
                   toFrom: resolvedPhone!,
                   content: textContent,
                   mediaType: mediaKind,
+                  mediaData: mediaData ?? undefined,
                 },
               })
             ).catch(() => {});
