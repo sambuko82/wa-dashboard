@@ -415,7 +415,7 @@ export class WhatsAppClient {
                   toFrom: resolvedPhone!,
                   content: textContent,
                   mediaType: mediaKind,
-                  mediaData: mediaData ?? undefined,
+                  mediaData: mediaData ? (mediaData as import("@prisma/client").Prisma.InputJsonValue) : undefined,
                 },
               })
             ).catch(() => {});
