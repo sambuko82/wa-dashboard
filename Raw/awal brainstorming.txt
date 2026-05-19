@@ -1,0 +1,111 @@
+# Pemetaan Sesi: JVTO WhatsApp Operations
+
+## 1. Genesis — Dari Mana Percakapan Ini Bermula
+
+Sesi ini dimulai dengan permintaan yang dibungkus sebagai "playbook komunikasi WhatsApp definitif" untuk JVTO. Frasanya: *"JVTO Customer Journey: The Definitive WhatsApp Communication Playbook."* Awalnya dipicu dengan command yang tercampur — slot-nya `draft-response` tapi argumennya `brainstorm` — yang segera diluruskan menjadi sesi sparring strategis.
+
+Dari awal, pertanyaan yang paling kamu inginkan jawabannya bukan "tulis template balasan WA", tapi lebih dalam: bagaimana mengelola seluruh percakapan WhatsApp JVTO secara sistematis, lintas channel, dengan satu staf yang sudah keteteran. Beberapa kali kamu menarik kembali frasa "playbook" karena terasa belum tepat — sampai akhirnya tiba di bentuk dokumen yang menjadi hasil akhir: peta operasi tertulis + rules engine eksekusi.
+
+Sepanjang percakapan, fokus berpindah-pindah antara strategi (apa yang harus terjadi) dan teknis (bagaimana mengimplementasikan), dengan kamu beberapa kali mengembalikan arah ke level strategi karena teknis bisa dieksekusi belakangan di Claude Code.
+
+## 2. Masalah Fundamental yang Dihadapi JVTO
+
+Masalahnya berlapis. Permukaan dan dalam.
+
+**Di permukaan:** WhatsApp adalah satu-satunya antarmuka utama JVTO ke dunia luar — semua percakapan customer, B2B, vendor, dan crew berjalan lewat aplikasi ini. Tidak ada pemisahan inbox per fungsi. Satu nomor menampung semuanya.
+
+**Di lapisan berikutnya:** Lima fungsi yang sebenarnya berbeda dijalankan oleh satu orang (Inan):
+- Sales (JVTO direct inquiry — calon tamu yang belum booking)
+- Concierge (JVTO direct post-booking — tamu yang sudah bayar)
+- Service desk (Klook — tamu yang booking via platform pihak ketiga, mostly FAQ)
+- Account management B2B (Window Travel — agent travel Malaysia)
+- Internal operations (vendor hotel + crew driver/guide)
+
+Setiap fungsi punya tone berbeda, otoritas berbeda, SLA berbeda, dan ekspektasi customer berbeda. Mencampur semuanya di satu inbox + satu kepala = sumber chaos.
+
+**Di lapisan paling dalam:** Inan adalah *single point of failure* — bus factor = 1. Tidak ada backup, tidak ada playbook tertulis, tidak ada cara cepat onboarding staf cadangan. Sam tidak punya visibilitas operasional tanpa bertanya ke Inan setiap kali. Tamu Eropa kirim pesan jam 02:00 WIB sering tidak dibalas sebelum jam 08:00 WIB — selisih 6 jam, dan untuk customer Eropa yang punya standar respons profesional tinggi, ini terbaca sebagai "kurang serius".
+
+Masalah teknis tambahan: WA Pro CRM yang dibangun David adalah WhatsApp gateway non-resmi (bukan Meta Cloud API official), yang artinya nomor bisnis JVTO punya risiko di-ban kalau pola pengiriman terlalu agresif atau pola pesan terbaca botty oleh Meta.
+
+Masalah lain yang muncul di percakapan: kredensial database produksi pernah ditempel di chat tanpa kesadaran risiko (selesai dengan komitmen rotate password & pakai password manager); folder AppData Claude bengkak (didiagnosa, belum dibersihkan); dan plugin hookify Claude Code bermasalah karena username Windows kamu mengandung spasi — yang diselesaikan dengan editing manifest plugin di sesi ini.
+
+## 3. Apa yang Kamu Ingin Bangun
+
+Bentuk yang kamu tuju bukan sebuah aplikasi tunggal, tapi sebuah **lapisan operasional terintegrasi di atas WhatsApp** yang melakukan beberapa hal sekaligus:
+
+**Memetakan semua nomor masuk ke channel yang benar secara otomatis.** Saat pesan masuk, sistem tahu apakah nomor ini tamu Klook yang sudah booking, tamu JVTO yang sedang inquiry, tamu JVTO post-booking, partner Window Travel, atau vendor/crew. Channel ini menentukan flow yang dipakai.
+
+**Memetakan state setiap customer.** Tahap mana customer ada — cold inquiry, qualified, quoted, booked, pre-tour, in-tour, post-tour. Setiap state punya konteks dan SLA berbeda.
+
+**Membedakan inquiry vs booking, lalu menyaring.** Inquiry tinggi-nilai (JVTO direct) tidak boleh tercampur prioritas dengan FAQ Klook ("kapan pickup?"). Sistem harus tahu mana yang perlu mata Sam, mana yang cukup Inan, mana yang AI bisa handle sendiri.
+
+**Memberikan AI sebagai co-pilot, bukan pengganti.** AI menyaring, mengklasifikasi, dan menyiapkan draft. Manusia (Inan/Sam) yang memutuskan apa yang dikirim, dengan beberapa pengecualian untuk intent low-risk yang sudah terbukti aman di-auto-handle (mis. Klook FAQ standar).
+
+**Meringankan beban Inan secara terukur.** Bukan dengan "AI menggantikan", tapi dengan otomatisasi pesan-pesan berulang yang tidak butuh keputusan manusia (auto-acknowledgment di luar jam kerja, FAQ Klook, pickup info data-driven). Tujuan akhir: Inan hanya menyentuh pesan yang benar-benar butuh perhatiannya.
+
+**Memisahkan secara fisik komunikasi customer dari operasional internal.** Tiga nomor WhatsApp terpisah (customer, B2B partner, internal ops) supaya context-switching antar fungsi tidak terjadi di satu inbox.
+
+**Memberikan visibilitas ke Sam.** Sam tidak harus terus-menerus bertanya ke Inan untuk tahu status hari ini — sistem yang menyajikan ringkasan operasional.
+
+**Dapat dibangun secara bertahap, dengan setiap fase punya gate criteria terukur.** Bukan big-bang. Mulai dari hal paling rendah-risiko, tinggi-value (auto-acknowledgment off-hours), naik bertahap ke draft-assist, lalu auto-reply selektif.
+
+Hasil dari diskusi ini adalah dua dokumen yang sekarang tersimpan di llm-wiki: `2026-05-14-whatsapp-operations-playbook.md` (peta strategi & flow) dan `2026-05-14-whatsapp-rules-engine.md` (logika eksekusi pure untuk konsumsi AI atau staf baru). Pembangunan teknis akan dilanjutkan di Claude Code.
+
+## 4. Sumber yang Sudah Kamu Miliki
+
+### Sumber daya manusia
+- **Sam (Agung Sambuko)** — founder JVTO, juga anggota aktif Tourist Police (Polpar/Ditpamobvit East Java). Otoritas pricing & strategic decision.
+- **Inan** — staf full-time, saat ini titik pusat semua operasi WhatsApp (sales, concierge, Klook, Window, vendor, crew).
+- **David** — staf IT full-time, pembangun WA Pro CRM dan back office Laravel.
+- **Dr. Ahmad Irwandanu** — dokter SIP-licensed yang menangani skrining medis untuk tour Kawah Ijen (per dokumen di wiki: `people/dr-ahmad-irwandanu`).
+- **Crew** — 11 staf KTA-credentialed (7 guide + 4 driver), terdaftar di `people/crew-registry`. Lulus pelatihan HPWKI/BBKSDA.
+
+### Infrastruktur teknis
+- **WA Pro CRM** (`wa-dashboard.javavolcano-touroperator.com`) — gateway WhatsApp internal yang dibangun David sendiri. REST API v1 (send_message, send_image_url, send_file_url, send_template) + webhook untuk inbound. Saat ini dipakai hanya untuk trigger outbound booking notifications.
+- **Back office Laravel** (`new-backoffice.javavolcano-touroperator.com`) — aplikasi internal JVTO dengan stack Laravel + Inertia + React. Finance Cockpit selesai dibangun Week 3 (per `F:\BACK OFFICE\CLAUDE.md`). Booking Overview API endpoint sudah berfungsi.
+- **MySQL `u1805424_jvto_clone`** di host Hostinger 153.92.9.37 — operational database. Berisi data booking, customer, transaksi.
+- **PostgreSQL** di JVTO website utama (terpisah dari MySQL back office).
+- **Webhook flow yang sudah aktif:** Booking via Klook atau website JVTO → webhook ke WA Pro CRM → trigger booking ke vendor → notif konfirmasi ke tamu → input ke database.
+
+### Aset konten (llm-wiki)
+Wiki Obsidian di `E:\Users\JAVA VOLCANO\llm-wiki` adalah content knowledge base yang sudah cukup matang. Isinya:
+
+- **Brand voice & komunikasi:** `content/brand-voice` (panduan tone Style A + Style B, voice invariants — forbidden phrases & approved Ijen language), `content/copy-bank` (snippet siap-pakai), `content/aeo-claims` (9 claim block C1–C9 dengan evidence chain), `content/faq-master` (FAQ AEO-formatted), `content/operational-facts` (suhu, travel time, jam dukungan, jadwal closure Ijen).
+
+- **Destinasi:** `destinations/kawah-ijen`, `destinations/mount-bromo`, `destinations/tumpak-sewu`, `destinations/madakaripura`, `destinations/papuma-beach`.
+
+- **Produk:** `products/packages-full-pricing` (pricing lengkap 22 paket), `products/packages-itineraries` (itinerary per paket).
+
+- **Orang & lisensi:** `people/agung-sambuko`, `people/dr-ahmad-irwandanu`, `people/crew-registry`, `credentials/legal-licenses` (NIB 1102230032918, TDUP, HPWKI, BBKSDA, ISIC), `credentials/trust-signals`.
+
+- **Review compilations:** Trustpilot 51 reviews (4.8/5), Google Maps 92 reviews (4.90/5), TripAdvisor 21 reviews (4.95/5), pattern analysis di `reviews/review-patterns`.
+
+- **Policy:** `sources/jvto-policy-pack-v6` (booking, payment, cancellation, inclusions/exclusions, privacy).
+
+- **Hotel & vendor:** `content/hotels` (23 partner hotel terdaftar per fase itinerary).
+
+- **Operational documentation:** `ops/ingestion-profiles`, `ops/compilation-profiles`, `ops/health-checks`, dan dua dokumen baru hasil sesi ini — `ops/2026-05-14-whatsapp-operations-playbook` dan `ops/2026-05-14-whatsapp-rules-engine`.
+
+### Channel komunikasi yang sudah berjalan
+- **Klook** sebagai aggregator pihak ketiga (volume tamu pre-tour FAQ).
+- **The Window Travel** — partner B2B Malaysia.
+- **JVTO website** sebagai sumber inquiry & direct booking langsung.
+
+### CLAUDE.md (project memory) yang sudah aktif
+- Global: di `C:\Users\JAVA VOLCANO\AppData\Roaming\Claude\local-agent-mode-sessions\...\.claude\CLAUDE.md` (preferensi pribadi: ruthless mentor, naming convention YYYY-MM-DD).
+- Wiki: `E:\Users\JAVA VOLCANO\llm-wiki\CLAUDE.md` (schema wiki, workflow ingest/query/lint, content production guidelines).
+- Back office: `F:\BACK OFFICE\CLAUDE.md` (sprint terakhir Finance Cockpit Week 3, gstack skills, build status, open items: `php artisan key:generate` & `migrate` belum dijalankan).
+
+---
+
+## File yang Dimodifikasi di Sesi Ini
+
+Sesi ini menyentuh file-file berikut:
+
+- **Dibuat:** `E:\Users\JAVA VOLCANO\llm-wiki\wiki\ops\2026-05-14-whatsapp-operations-playbook.md`
+- **Dibuat:** `E:\Users\JAVA VOLCANO\llm-wiki\wiki\ops\2026-05-14-whatsapp-rules-engine.md`
+- **Dibuat:** `C:\Users\JAVA VOLCANO\Downloads\hooks-FIXED.json` (perbaikan plugin Claude Code hookify)
+- **Diupdate:** `E:\Users\JAVA VOLCANO\llm-wiki\wiki\index.md`
+- **Diupdate:** `E:\Users\JAVA VOLCANO\llm-wiki\wiki\log.md`
+
+Itu pemetaan komprehensifnya.
