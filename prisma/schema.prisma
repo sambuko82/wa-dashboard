@@ -244,3 +244,25 @@ model TemplateVariable {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model JvtoReplyDraft {
+  id                 String    @id @default(cuid())
+  phone              String
+  incomingMessage    String    @db.Text
+  draft              String    @db.Text
+  draftType          String
+  templateId         String?
+  packageSlug        String?
+  confidence         Float?
+  riskLevel          String    // low | medium | high
+  verificationStatus String    // passed | needs_review | blocked
+  checks             Json      // Record<string, boolean> — 21 keys
+  failedRules        Json      // string[]
+  notesForStaff      Json      // string[]
+  sourceRefs         Json      // string[]
+  sentAt             DateTime?
+  createdAt          DateTime  @default(now())
+
+  @@index([phone])
+  @@index([createdAt])
+}

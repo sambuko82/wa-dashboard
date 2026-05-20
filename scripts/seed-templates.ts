@@ -7,9 +7,17 @@ import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { jvtoTemplatePack } from "./jvto-template-pack";
+
+const DATABASE_URL = process.env.DATABASE_URL;
+
+if (!DATABASE_URL) {
+  console.error("DATABASE_URL is required to seed templates.");
+  process.exit(1);
+}
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL!,
+  connectionString: DATABASE_URL,
   connectionTimeoutMillis: 10_000,
 });
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,7 +27,7 @@ const USER_ID = "cmny7c38a00006lql90lg6yve";
 
 // ─── Template definitions ─────────────────────────────────────────────────────
 
-const templates = [
+const legacyTemplates = [
   // ── 1. Trip Media Reminder Crew ───────────────────────────────────────────
   {
     name: "Trip Media Reminder Crew",
@@ -140,6 +148,8 @@ const templates = [
 
   // ── END ──────────────────────────────────────────────────────────────────
 ];
+
+const templates = [...legacyTemplates, ...jvtoTemplatePack];
 
 // ─── Insert ───────────────────────────────────────────────────────────────────
 

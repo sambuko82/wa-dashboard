@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "prisma migrate deploy && prisma generate && next build",
     "start": "next start",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "build:context": "npx tsx scripts/build-jvto-context-index.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
