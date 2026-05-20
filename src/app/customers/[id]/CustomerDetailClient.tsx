@@ -25,6 +25,7 @@ import {
   Video,
   X,
 } from "lucide-react";
+import DraftPanel from "@/components/draft-panel";
 import { cn } from "@/lib/utils";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -601,25 +602,37 @@ export default function CustomerDetailClient() {
             </div>
           </div>
 
-          {/* Side: pipeline */}
-          <div className="app-card p-5">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Pipeline Stage</p>
-            <select
-              value={crm?.pipelineStageId ?? ""}
-              onChange={(e) => updateStage(e.target.value)}
-              className="app-select w-full"
-            >
-              <option value="">Not assigned</option>
-              {stages.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-            {crm?.pipelineStage && (
-              <div className="mt-3 flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: crm.pipelineStage.color }} />
-                <span className="text-sm font-medium text-slate-700">{crm.pipelineStage.name}</span>
-              </div>
-            )}
+          {/* Side: pipeline + draft panel */}
+          <div className="space-y-4">
+            <div className="app-card p-5">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Pipeline Stage</p>
+              <select
+                value={crm?.pipelineStageId ?? ""}
+                onChange={(e) => updateStage(e.target.value)}
+                className="app-select w-full"
+              >
+                <option value="">Not assigned</option>
+                {stages.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+              {crm?.pipelineStage && (
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: crm.pipelineStage.color }} />
+                  <span className="text-sm font-medium text-slate-700">{crm.pipelineStage.name}</span>
+                </div>
+              )}
+            </div>
+
+            <DraftPanel
+              phone={phone}
+              customerId={id}
+              selectedNumberId={selectedNumber}
+              onSend={(text) => {
+                setMsgText(text);
+                setTimeout(fetchMessages, 600);
+              }}
+            />
           </div>
         </div>
       )}
