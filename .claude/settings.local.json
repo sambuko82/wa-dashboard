@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la src/lib/)",
+      "Bash(ls -la src/utils/)",
+      "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && head -5 {}')",
+      "Bash(Get-ChildItem -Path \"D:\\\\wa-dashboard\" -Recurse -Depth 2 -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -Property FullName, PSIsContainer)",
+      "Bash(npx prisma *)",
+      "Bash(npm run *)",
+      "Bash(node -e ' *)",
+      "Bash(npx tsc *)",
+      "Bash(node --input-type=module)",
+      "Bash(grep -r \"DATABASE_URL\" --include=\"*.ts\" -l)",
+      "Bash(grep \"DATABASE_URL\" prisma.config.ts)",
+      "Bash(npx tsx *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --title 'feat: JVTO Knowledge-to-Reply Engine \\(no-LLM, Phase 1\\)' --body ' *)",
+      "Bash(git checkout *)",
+      "Bash(git merge *)",
+      "Skill(browse)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Get-Process *)",
+      "Bash(git *)",
+      "Bash(curl -s http://localhost:3000/api/health)",
+      "Bash(curl *)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' goto http://localhost:3000/numbers/cmpdircax0000dwcnl82dyykm)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' screenshot /tmp/qr-fresh.png)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' snapshot -i)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' click @e15)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' viewport 800x900 --scale 2)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' screenshot /tmp/qr-big.png --selector img)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' screenshot /tmp/status-check.png)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' cookies)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' goto http://localhost:3000/api/admin/users)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' text)",
+      "Bash($B screenshot *)",
+      "Bash('/c/Users/JAVA VOLCANO/.claude/skills/gstack/browse/dist/browse' goto http://localhost:3000/api/numbers/cmpdircax0000dwcnl82dyykm/status)"
+    ]
+  }
+}
